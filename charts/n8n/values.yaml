@@ -90,7 +90,7 @@ config:
   nodesInclude: ""
   # JS Code node import allowlists for internal runner mode.
   # External runner: set runner.javascript.builtinAllow / externalAllow.
-  nodesFunctionAllowBuiltin: ""  # e.g. "fs,path" or "*"
+  nodesFunctionAllowBuiltin: "" # e.g. "fs,path" or "*"
   nodesFunctionAllowExternal: "" # e.g. "lodash,moment"
 
   # ── Metrics (Prometheus) ──
@@ -137,7 +137,7 @@ database:
   user: n8n
   schema: public
   poolSize: 2
-  connectionTimeout: 20000    # ms; connection wait limit
+  connectionTimeout: 20000 # ms; connection wait limit
   idleConnectionTimeout: 30000 # ms; idle connection eviction threshold
   ssl:
     enabled: true
@@ -196,7 +196,7 @@ runner:
   logLevel: info # debug | info | warn | error
   # JavaScript runner import allowlists
   javascript:
-    builtinAllow: ""  # stdlib modules allowed; "*" = all; e.g. "fs,path"
+    builtinAllow: "" # stdlib modules allowed; "*" = all; e.g. "fs,path"
     externalAllow: "" # third-party packages; "*" = all
   # Python runner permissions (n8n-task-runners.json env-overrides)
   python:
