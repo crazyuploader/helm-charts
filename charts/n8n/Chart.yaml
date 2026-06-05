@@ -15,3 +15,12 @@ home: https://n8n.io
 maintainers:
   - name: crazyuploader
     url: https://github.com/crazyuploader
+annotations:
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: n8n docs
+      url: https://docs.n8n.io
+    - name: source
+      url: https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n
+  artifacthub.io/changes: |
+    - Initial release with external task runners (JS + Python 3.13), queue mode, SMTP, and Prometheus metrics

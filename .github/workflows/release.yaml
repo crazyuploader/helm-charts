@@ -10,6 +10,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -54,4 +57,17 @@ jobs:
             [ -f "$tgz" ] || continue
             echo "Pushing $tgz"
             helm push "$tgz" "oci://${OCI_REGISTRY}/${OCI_REPO_PATH}"
+          done
+
+      - name: Push to ghcr.io
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GITHUB_TOKEN" | helm registry login ghcr.io \
+            -u ${{ github.repository_owner }} \
+            --password-stdin
+          for tgz in /tmp/charts/*.tgz; do
+            [ -f "$tgz" ] || continue
+            echo "Pushing $tgz"
+            helm push "$tgz" "oci://ghcr.io/${{ github.repository_owner }}/helm-charts"
           done
