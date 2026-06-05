@@ -159,10 +159,10 @@ data:
   {{- end }}
   QUEUE_BULL_REDIS_TIMEOUT_THRESHOLD: {{ .Values.queue.redis.timeoutThreshold | toString | quote }}
   {{- end }}
+  OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
   {{- end }}
   # Task runner
   {{- if .Values.runner.enabled }}
-  N8N_RUNNERS_ENABLED: "true"
   N8N_RUNNERS_MODE: external
   # broker must listen on 0.0.0.0; default 127.0.0.1 blocks cross-pod connections
   N8N_RUNNERS_BROKER_LISTEN_ADDRESS: "0.0.0.0"

@@ -2,7 +2,7 @@ apiVersion: v2
 name: n8n
 description: Helm chart for n8n workflow automation
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "2.25.4"
 keywords:
   - n8n
@@ -24,4 +24,5 @@ annotations:
     - name: source
       url: https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n
   artifacthub.io/changes: |
-    - Initial release with external task runners (JS + Python 3.13), queue mode, SMTP, and Prometheus metrics
+    - Remove deprecated N8N_RUNNERS_ENABLED env var
+    - Add OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true when runner + queue mode enabled
