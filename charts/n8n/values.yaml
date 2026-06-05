@@ -1,6 +1,6 @@
 image:
   repository: n8nio/n8n
-  tag: ""  # blank = Chart.AppVersion
+  tag: "" # blank = Chart.AppVersion
   pullPolicy: IfNotPresent
 
 replicaCount: 1
@@ -15,16 +15,16 @@ podAnnotations: {}
 # ── Core ─────────────────────────────────────────────────────────────────────
 
 config:
-  host: ""        # required; public hostname
+  host: "" # required; public hostname
   protocol: https
-  editorBaseUrl: ""     # blank = protocol+host
+  editorBaseUrl: "" # blank = protocol+host
   webhookUrl: ""
-  proxyHops: 0          # hops before n8n (1 = Cloudflare Tunnel)
+  proxyHops: 0 # hops before n8n (1 = Cloudflare Tunnel)
   port: 5678
   listenAddress: "0.0.0.0"
   path: "/"
-  gracefulShutdownTimeout: 30  # seconds
-  timezone: "UTC"       # GENERIC_TIMEZONE; sets timezone for cron/schedule triggers
+  gracefulShutdownTimeout: 30 # seconds
+  timezone: "UTC" # GENERIC_TIMEZONE; sets timezone for cron/schedule triggers
 
   # ── UI / notifications ──
   disableUi: false
@@ -41,43 +41,43 @@ config:
 
   # ── Settings file ──
   enforceSettingsFilePermissions: true
-  migrateFsStoragePath: true  # renames binaryData -> storage (n8n v3 prep)
+  migrateFsStoragePath: true # renames binaryData -> storage (n8n v3 prep)
 
   # ── Security ──
   blockEnvAccessInNode: false
   gitNodeDisableBareRepos: true
   secureCookie: true
-  samesiteCookie: "lax"      # strict | lax | none
-  restrictFileAccessTo: ""   # comma-separated paths
+  samesiteCookie: "lax" # strict | lax | none
+  restrictFileAccessTo: "" # comma-separated paths
 
   # ── Logging ──
-  logLevel: info              # debug | info | warn | error
-  logOutput: console          # console | file | console,file
+  logLevel: info # debug | info | warn | error
+  logOutput: console # console | file | console,file
   # only when logOutput includes "file"
   logFileLocation: "/home/node/.n8n/logs/n8n.log"
-  logFileMaxSize: 16          # MB
+  logFileMaxSize: 16 # MB
   logFileMaxCount: 100
 
   # ── Binary data ──
   binaryData:
-    mode: default           # default (memory) | filesystem | s3
+    mode: default # default (memory) | filesystem | s3
     # only when mode: filesystem
     localStoragePath: ""
 
   # ── Executions ──
-  executionsMode: main        # main | queue (requires Redis)
-  executionsTimeout: -1       # seconds; -1 = unlimited
+  executionsMode: main # main | queue (requires Redis)
+  executionsTimeout: -1 # seconds; -1 = unlimited
   executionsTimeoutMax: 3600
   concurrencyProductionLimit: -1
   # Pruning
   executionsPrune: true
-  executionsMaxAge: 336       # hours (14 days)
+  executionsMaxAge: 336 # hours (14 days)
   executionsPruneMaxCount: 10000
-  executionsSaveOnError: all    # all | none
-  executionsSaveOnSuccess: all  # all | none
+  executionsSaveOnError: all # all | none
+  executionsSaveOnSuccess: all # all | none
   executionsSaveManual: true
-  executionsPruneSoftDeleteInterval: 60   # minutes
-  executionsPruneHardDeleteInterval: 15   # minutes
+  executionsPruneSoftDeleteInterval: 60 # minutes
+  executionsPruneHardDeleteInterval: 15 # minutes
 
   # ── Nodes ──
   pythonEnabled: false
@@ -101,7 +101,7 @@ config:
     host: ""
     port: 587
     user: ""
-    sender: ""     # e.g. "n8n <noreply@example.com>"
+    sender: "" # e.g. "n8n <noreply@example.com>"
     ssl: false
     startTls: true
 
@@ -112,7 +112,7 @@ config:
   userManagement:
     jwtSecretFromExistingSecret: false
     jwtDurationHours: 168
-    jwtRefreshTimeoutHours: 0   # 0 = auto (25% of jwtDurationHours)
+    jwtRefreshTimeoutHours: 0 # 0 = auto (25% of jwtDurationHours)
 
   # ── License ──
   license:
@@ -122,7 +122,7 @@ config:
 # ── Database ─────────────────────────────────────────────────────────────────
 
 database:
-  host: ""  # required
+  host: "" # required
   port: 5432
   name: n8n
   user: n8n
@@ -146,7 +146,7 @@ queue:
     username: ""
     tls: false
     prefix: ""
-    timeoutThreshold: 10000  # ms
+    timeoutThreshold: 10000 # ms
 
 # ── Secrets ──────────────────────────────────────────────────────────────────
 
@@ -171,16 +171,16 @@ runner:
     - python
   image:
     repository: n8nio/runners
-    tag: ""  # blank = Chart.AppVersion
+    tag: "" # blank = Chart.AppVersion
     pullPolicy: IfNotPresent
   concurrency: 5
-  taskTimeout: 300          # seconds; runner restarts tasks exceeding this
-  autoShutdownTimeout: 15   # seconds idle before runner subprocess shuts down
-  logLevel: info            # debug | info | warn | error
+  taskTimeout: 300 # seconds; runner restarts tasks exceeding this
+  autoShutdownTimeout: 15 # seconds idle before runner subprocess shuts down
+  logLevel: info # debug | info | warn | error
   # Python runner permissions (n8n-task-runners.json env-overrides)
   python:
-    stdlibAllow: ""         # stdlib modules allowed; "*" = all
-    externalAllow: ""       # third-party packages allowed; "*" = all
+    stdlibAllow: "" # stdlib modules allowed; "*" = all
+    externalAllow: "" # third-party packages allowed; "*" = all
   resources: {}
   podAnnotations: {}
 

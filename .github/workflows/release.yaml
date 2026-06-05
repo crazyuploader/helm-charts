@@ -47,9 +47,9 @@ jobs:
           OCI_PASSWORD: ${{ secrets.OCI_PASSWORD }}
           OCI_REPO_PATH: ${{ secrets.OCI_REPO_PATH }}
         run: |
-          helm registry login "$OCI_REGISTRY" \
+          echo "$OCI_PASSWORD" | helm registry login "$OCI_REGISTRY" \
             -u "$OCI_USERNAME" \
-            -p "$OCI_PASSWORD"
+            --password-stdin
           for tgz in /tmp/charts/*.tgz; do
             [ -f "$tgz" ] || continue
             echo "Pushing $tgz"
