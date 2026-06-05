@@ -16,6 +16,7 @@ maintainers:
   - name: crazyuploader
     url: https://github.com/crazyuploader
 annotations:
+  artifacthub.io/repo-id: 77d03ad2-ee36-42fc-9f19-0856b1bab276
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: n8n docs
