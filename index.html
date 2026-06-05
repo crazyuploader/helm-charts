@@ -32,8 +32,6 @@
         --text-dim: #4a6070;
         --text-mid: #7a9ab0;
         --accent: #00e87a;
-        --accent2: #00b85e;
-        --red: #ff4545;
         --amber: #ffb830;
         --font-sans: "Syne", sans-serif;
         --font-mono: "JetBrains Mono", monospace;
@@ -52,7 +50,6 @@
         overflow-x: hidden;
       }
 
-      /* ── Grain overlay ── */
       body::before {
         content: "";
         position: fixed;
@@ -63,7 +60,6 @@
         opacity: 0.6;
       }
 
-      /* ── Scrollbar ── */
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -129,9 +125,10 @@
       /* ── Hero ── */
       .hero {
         min-height: 100vh;
-        display: grid;
-        grid-template-rows: 1fr auto;
-        padding: 0 40px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 120px 40px 80px;
         position: relative;
         overflow: hidden;
       }
@@ -167,10 +164,6 @@
       }
 
       .hero-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding-top: 120px;
         position: relative;
         z-index: 1;
       }
@@ -275,32 +268,7 @@
         color: var(--accent);
       }
 
-      .hero-stats {
-        display: flex;
-        gap: 48px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-        opacity: 0;
-        animation: fadeUp 0.7s ease 0.55s forwards;
-      }
-
-      .stat-value {
-        font-family: var(--font-sans);
-        font-weight: 800;
-        font-size: 28px;
-        color: var(--text);
-        line-height: 1;
-      }
-
-      .stat-label {
-        font-size: 11px;
-        color: var(--text-dim);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-top: 4px;
-      }
-
-      /* ── Install block ── */
+      /* ── Install strip ── */
       .install-strip {
         background: var(--bg2);
         border-top: 1px solid var(--border);
@@ -360,49 +328,17 @@
         transition: all 0.2s;
       }
 
-      .copy-btn:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
+      .copy-btn:hover,
       .copy-btn.copied {
         border-color: var(--accent);
         color: var(--accent);
       }
 
-      /* ── Section ── */
-      section {
+      /* ── Charts grid ── */
+      .charts-section {
         padding: 80px 40px;
       }
 
-      .section-label {
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .section-label::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-        max-width: 60px;
-      }
-
-      .section-title {
-        font-family: var(--font-sans);
-        font-weight: 800;
-        font-size: clamp(32px, 5vw, 56px);
-        line-height: 1;
-        letter-spacing: -0.02em;
-        margin-bottom: 48px;
-      }
-
-      /* ── Charts grid ── */
       .charts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -461,37 +397,7 @@
       .chart-desc {
         font-size: 13px;
         color: var(--text-mid);
-        margin-bottom: 24px;
         line-height: 1.6;
-      }
-
-      .chart-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 24px;
-      }
-
-      .tag {
-        font-size: 11px;
-        padding: 3px 10px;
-        border: 1px solid var(--border);
-        color: var(--text-dim);
-        letter-spacing: 0.06em;
-        border-radius: 2px;
-      }
-
-      .tag.green {
-        border-color: rgba(0, 232, 122, 0.3);
-        color: var(--accent);
-      }
-      .tag.amber {
-        border-color: rgba(255, 184, 48, 0.3);
-        color: var(--amber);
-      }
-      .tag.blue {
-        border-color: rgba(96, 200, 255, 0.3);
-        color: #60c8ff;
       }
 
       .chart-meta {
@@ -500,7 +406,7 @@
         gap: 1px;
         background: var(--border);
         border-top: 1px solid var(--border);
-        margin: 0 -36px -36px;
+        margin: 32px -36px -36px;
       }
 
       .meta-item {
@@ -526,110 +432,6 @@
         color: var(--text);
       }
 
-      /* ── Terminal block ── */
-      .terminal {
-        background: var(--bg2);
-        border: 1px solid var(--border);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-
-      .terminal-bar {
-        background: var(--bg3);
-        padding: 10px 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-      }
-      .dot-red {
-        background: #ff5f57;
-      }
-      .dot-amber {
-        background: #ffbd2e;
-      }
-      .dot-green {
-        background: #28ca40;
-      }
-
-      .terminal-title {
-        font-size: 11px;
-        color: var(--text-dim);
-        margin-left: auto;
-        margin-right: auto;
-        letter-spacing: 0.06em;
-      }
-
-      .terminal-body {
-        padding: 24px;
-        font-size: 13px;
-        line-height: 2;
-      }
-
-      .t-prompt {
-        color: var(--accent);
-      }
-      .t-cmd {
-        color: var(--amber);
-      }
-      .t-flag {
-        color: #60c8ff;
-      }
-      .t-val {
-        color: var(--text);
-      }
-      .t-comment {
-        color: var(--text-dim);
-      }
-      .t-out {
-        color: var(--text-mid);
-        padding-left: 20px;
-      }
-      .t-ok {
-        color: var(--accent);
-      }
-
-      .t-line {
-        display: block;
-      }
-
-      /* ── Registry section ── */
-      .registry-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        align-items: start;
-      }
-
-      @media (max-width: 768px) {
-        .registry-layout {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .registry-url {
-        font-family: var(--font-sans);
-        font-weight: 800;
-        font-size: clamp(18px, 2.5vw, 28px);
-        color: var(--accent);
-        letter-spacing: -0.01em;
-        margin-bottom: 16px;
-        word-break: break-all;
-      }
-
-      .registry-desc {
-        font-size: 13px;
-        color: var(--text-mid);
-        line-height: 1.7;
-        margin-bottom: 24px;
-      }
-
       /* ── Footer ── */
       footer {
         border-top: 1px solid var(--border);
@@ -637,7 +439,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: gap;
+        flex-wrap: wrap;
         gap: 16px;
       }
 
@@ -667,7 +469,6 @@
         color: var(--accent);
       }
 
-      /* ── Cursor blink ── */
       .cursor {
         display: inline-block;
         width: 8px;
@@ -677,7 +478,6 @@
         animation: blink 1.1s step-end infinite;
       }
 
-      /* ── Animations ── */
       @keyframes fadeUp {
         from {
           opacity: 0;
@@ -708,20 +508,16 @@
         }
       }
 
-      /* ── Responsive ── */
       @media (max-width: 640px) {
         nav,
-        section,
+        .charts-section,
         .install-strip,
         footer {
           padding-left: 20px;
           padding-right: 20px;
         }
         .hero {
-          padding: 0 20px 40px;
-        }
-        .hero-stats {
-          gap: 24px;
+          padding: 100px 20px 60px;
         }
         nav {
           padding: 16px 20px;
@@ -733,7 +529,6 @@
     </style>
   </head>
   <body>
-    <!-- Nav -->
     <nav>
       <a href="#" class="nav-logo">~/helm<span>-charts</span></a>
       <ul class="nav-links">
@@ -750,11 +545,9 @@
       </ul>
     </nav>
 
-    <!-- Hero -->
     <div class="hero">
       <div class="hero-grid-lines"></div>
       <div class="hero-glow"></div>
-
       <div class="hero-content">
         <p class="hero-eyebrow">crazyuploader / helm-charts</p>
         <h1 class="hero-title">
@@ -762,9 +555,7 @@
           <span class="line2">CHARTS</span>
         </h1>
         <p class="hero-sub">
-          Production Helm charts published to a self-hosted OCI registry.
-          Automated CI on every merge. Currently shipping n8n with external task
-          runners.
+          Production Helm charts on a self-hosted OCI registry.
         </p>
         <div class="hero-actions">
           <a href="#charts" class="btn btn-primary">Browse charts</a>
@@ -777,28 +568,8 @@
           >
         </div>
       </div>
-
-      <div class="hero-stats">
-        <div>
-          <div class="stat-value">01</div>
-          <div class="stat-label">Charts</div>
-        </div>
-        <div>
-          <div class="stat-value">v4</div>
-          <div class="stat-label">Helm</div>
-        </div>
-        <div>
-          <div class="stat-value">OCI</div>
-          <div class="stat-label">Registry</div>
-        </div>
-        <div>
-          <div class="stat-value">2.25</div>
-          <div class="stat-label">n8n ver</div>
-        </div>
-      </div>
     </div>
 
-    <!-- Install strip -->
     <div class="install-strip" id="install">
       <span class="install-label">Quick install</span>
       <span class="install-cmd">
@@ -813,11 +584,7 @@
       </button>
     </div>
 
-    <!-- Charts -->
-    <section id="charts">
-      <p class="section-label">Available</p>
-      <h2 class="section-title">Charts</h2>
-
+    <div class="charts-section" id="charts">
       <div class="charts-grid">
         <a
           href="https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n"
@@ -828,16 +595,8 @@
           <div class="chart-index">CHART / 001</div>
           <div class="chart-name">n8n</div>
           <div class="chart-desc">
-            Workflow automation with PostgreSQL, external JS + Python task
-            runners, queue mode via Redis, SMTP, and Prometheus metrics.
-          </div>
-          <div class="chart-tags">
-            <span class="tag green">JS runner</span>
-            <span class="tag green">Python runner</span>
-            <span class="tag amber">Queue mode</span>
-            <span class="tag blue">Prometheus</span>
-            <span class="tag">SMTP</span>
-            <span class="tag">S3 storage</span>
+            Workflow automation with PostgreSQL, external JS + Python 3.13 task
+            runners, Redis queue mode, and Prometheus metrics.
           </div>
           <div class="chart-meta">
             <div class="meta-item">
@@ -848,122 +607,14 @@
               <div class="meta-key">App</div>
               <div class="meta-val">2.25.4</div>
             </div>
-            <div class="meta-item">
-              <div class="meta-key">Registry</div>
-              <div class="meta-val" style="font-size: 11px">
-                zot.devjugal.com
-              </div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-key">Runners</div>
-              <div class="meta-val">JS + Py 3.13</div>
-            </div>
           </div>
         </a>
       </div>
-    </section>
+    </div>
 
-    <!-- Install steps -->
-    <section>
-      <p class="section-label">Setup</p>
-      <h2 class="section-title">Get running</h2>
-
-      <div class="registry-layout">
-        <div class="registry-info">
-          <div class="registry-url">oci://zot.devjugal.com/helm/charts</div>
-          <p class="registry-desc">
-            Charts are hosted on a self-managed Zot OCI registry. No Helm repo
-            add needed — pull directly with
-            <code style="color: var(--accent)">helm install</code> or
-            <code style="color: var(--accent)">helm pull</code>.
-          </p>
-          <a
-            href="https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n"
-            target="_blank"
-            rel="noopener"
-            class="btn btn-ghost"
-            style="display: inline-flex"
-          >
-            View values.yaml ↗
-          </a>
-        </div>
-
-        <div class="terminal">
-          <div class="terminal-bar">
-            <div class="dot dot-red"></div>
-            <div class="dot dot-amber"></div>
-            <div class="dot dot-green"></div>
-            <span class="terminal-title">install.sh</span>
-          </div>
-          <div class="terminal-body">
-            <span class="t-line"
-              ><span class="t-comment"># 1. create the secret</span></span
-            >
-            <span class="t-line"
-              ><span class="t-prompt">$ </span
-              ><span class="t-cmd">kubectl create secret generic</span>
-              <span class="t-val">n8n-secret</span> \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-flag">--from-literal</span>=<span
-                class="t-val"
-                >db_password</span
-              >=<span class="t-flag">&lt;pg-pass&gt;</span> \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-flag">--from-literal</span>=<span
-                class="t-val"
-                >encryption_key</span
-              >=<span class="t-flag">&lt;32-chars&gt;</span> \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-flag">--from-literal</span>=<span
-                class="t-val"
-                >runner_auth_token</span
-              >=<span class="t-flag">&lt;32-chars&gt;</span></span
-            >
-            <span class="t-line">&nbsp;</span>
-            <span class="t-line"
-              ><span class="t-comment"># 2. install</span></span
-            >
-            <span class="t-line"
-              ><span class="t-prompt">$ </span
-              ><span class="t-cmd">helm install</span>
-              <span class="t-val">n8n</span> \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-val"
-                >oci://zot.devjugal.com/helm/charts/n8n</span
-              >
-              \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-flag">--version</span>
-              <span class="t-val">0.1.0</span> \</span
-            >
-            <span class="t-line"
-              >&nbsp;&nbsp;<span class="t-flag">-f</span>
-              <span class="t-val">values.yaml</span></span
-            >
-            <span class="t-line">&nbsp;</span>
-            <span class="t-line t-out"
-              ><span class="t-ok">Pulled:</span>
-              zot.devjugal.com/helm/charts/n8n:0.1.0</span
-            >
-            <span class="t-line t-out"
-              ><span class="t-ok">deployed</span> n8n 0.1.0</span
-            >
-            <span class="t-line">&nbsp;<span class="cursor"></span></span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
     <footer>
       <div class="footer-left">
-        maintained by <span>crazyuploader</span> · built with Helm
-        <span>v4</span>
+        maintained by <span>crazyuploader</span> · Helm <span>v4</span>
       </div>
       <div class="footer-links">
         <a
@@ -997,7 +648,6 @@
         });
       }
 
-      // Stagger feature cards on scroll
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry, i) => {
@@ -1011,7 +661,7 @@
       );
 
       document
-        .querySelectorAll(".feature, .chart-card")
+        .querySelectorAll(".chart-card")
         .forEach((el) => observer.observe(el));
     </script>
   </body>
