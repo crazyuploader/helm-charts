@@ -1,7 +1,7 @@
 # helm-charts
 
 ![Release Charts](https://github.com/crazyuploader/helm-charts/actions/workflows/release.yaml/badge.svg)
-![Helm](https://img.shields.io/badge/helm-v3-blue)
+![Helm](https://img.shields.io/badge/helm-v4-blue)
 
 Helm charts published to an OCI registry.
 
