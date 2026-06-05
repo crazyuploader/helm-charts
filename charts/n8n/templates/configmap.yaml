@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "n8n.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "n8n.labels" . | nindent 4 }}
+data:
+  # Database
+  DB_TYPE: postgresdb
+  DB_POSTGRESDB_HOST: {{ required "database.host is required" .Values.database.host | quote }}
+  DB_POSTGRESDB_PORT: {{ .Values.database.port | toString | quote }}
+  DB_POSTGRESDB_DATABASE: {{ .Values.database.name | quote }}
+  DB_POSTGRESDB_USER: {{ .Values.database.user | quote }}
+  DB_POSTGRESDB_SCHEMA: {{ .Values.database.schema | quote }}
+  DB_POSTGRESDB_POOL_SIZE: {{ .Values.database.poolSize | toString | quote }}
+  DB_POSTGRESDB_SSL_ENABLED: {{ .Values.database.ssl.enabled | toString | quote }}
+  DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: {{ .Values.database.ssl.rejectUnauthorized | toString | quote }}
+  {{- if .Values.database.ssl.ca }}
+  DB_POSTGRESDB_SSL_CA: {{ .Values.database.ssl.ca | quote }}
+  {{- end }}
+  {{- if .Values.database.ssl.cert }}
+  DB_POSTGRESDB_SSL_CERT: {{ .Values.database.ssl.cert | quote }}
+  {{- end }}
+  {{- if .Values.database.ssl.key }}
+  DB_POSTGRESDB_SSL_KEY: {{ .Values.database.ssl.key | quote }}
+  {{- end }}
+  # Core
+  N8N_HOST: {{ required "config.host is required" .Values.config.host | quote }}
+  N8N_PROTOCOL: {{ .Values.config.protocol | quote }}
+  N8N_EDITOR_BASE_URL: {{ default (printf "%s://%s" .Values.config.protocol .Values.config.host) .Values.config.editorBaseUrl | quote }}
+  N8N_PORT: {{ .Values.config.port | toString | quote }}
+  N8N_LISTEN_ADDRESS: {{ .Values.config.listenAddress | quote }}
+  N8N_PATH: {{ .Values.config.path | quote }}
+  N8N_PROXY_HOPS: {{ .Values.config.proxyHops | toString | quote }}
+  N8N_GRACEFUL_SHUTDOWN_TIMEOUT: {{ .Values.config.gracefulShutdownTimeout | toString | quote }}
+  GENERIC_TIMEZONE: {{ .Values.config.timezone | quote }}
+  {{- if .Values.config.webhookUrl }}
+  WEBHOOK_URL: {{ .Values.config.webhookUrl | quote }}
+  {{- end }}
+  # UI / notifications
+  N8N_DISABLE_UI: {{ .Values.config.disableUi | toString | quote }}
+  N8N_TEMPLATES_ENABLED: {{ .Values.config.templatesEnabled | toString | quote }}
+  N8N_VERSION_NOTIFICATIONS_ENABLED: {{ .Values.config.versionNotificationsEnabled | toString | quote }}
+  N8N_PERSONALIZATION_ENABLED: {{ .Values.config.personalizationEnabled | toString | quote }}
+  N8N_DIAGNOSTICS_ENABLED: {{ .Values.config.diagnosticsEnabled | toString | quote }}
+  N8N_HIRING_BANNER_ENABLED: {{ .Values.config.hiringBannerEnabled | toString | quote }}
+  # Public API
+  N8N_PUBLIC_API_DISABLED: {{ .Values.config.publicApiDisabled | toString | quote }}
+  N8N_PUBLIC_API_SWAGGERUI_DISABLED: {{ .Values.config.publicApiSwaggerUiDisabled | toString | quote }}
+  N8N_PUBLIC_API_ENDPOINT: {{ .Values.config.publicApiEndpoint | quote }}
+  # Settings file
+  N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: {{ .Values.config.enforceSettingsFilePermissions | toString | quote }}
+  N8N_MIGRATE_FS_STORAGE_PATH: {{ .Values.config.migrateFsStoragePath | toString | quote }}
+  # Security
+  N8N_BLOCK_ENV_ACCESS_IN_NODE: {{ .Values.config.blockEnvAccessInNode | toString | quote }}
+  N8N_GIT_NODE_DISABLE_BARE_REPOS: {{ .Values.config.gitNodeDisableBareRepos | toString | quote }}
+  N8N_SECURE_COOKIE: {{ .Values.config.secureCookie | toString | quote }}
+  N8N_SAMESITE_COOKIE: {{ .Values.config.samesiteCookie | quote }}
+  {{- if .Values.config.restrictFileAccessTo }}
+  N8N_RESTRICT_FILE_ACCESS_TO: {{ .Values.config.restrictFileAccessTo | quote }}
+  {{- end }}
+  # Logging
+  N8N_LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  N8N_LOG_OUTPUT: {{ .Values.config.logOutput | quote }}
+  {{- if contains "file" .Values.config.logOutput }}
+  N8N_LOG_FILE_LOCATION: {{ .Values.config.logFileLocation | quote }}
+  N8N_LOG_FILE_MAXSIZE: {{ .Values.config.logFileMaxSize | toString | quote }}
+  N8N_LOG_FILE_MAXCOUNT: {{ .Values.config.logFileMaxCount | toString | quote }}
+  {{- end }}
+  # Binary data
+  N8N_DEFAULT_BINARY_DATA_MODE: {{ .Values.config.binaryData.mode | quote }}
+  {{- if eq .Values.config.binaryData.mode "filesystem" }}
+  {{- if .Values.config.binaryData.localStoragePath }}
+  N8N_BINARY_DATA_STORAGE_PATH: {{ .Values.config.binaryData.localStoragePath | quote }}
+  {{- end }}
+  {{- end }}
+  # Executions
+  EXECUTIONS_MODE: {{ .Values.config.executionsMode | quote }}
+  EXECUTIONS_TIMEOUT: {{ .Values.config.executionsTimeout | toString | quote }}
+  EXECUTIONS_TIMEOUT_MAX: {{ .Values.config.executionsTimeoutMax | toString | quote }}
+  N8N_CONCURRENCY_PRODUCTION_LIMIT: {{ .Values.config.concurrencyProductionLimit | toString | quote }}
+  EXECUTIONS_DATA_PRUNE: {{ .Values.config.executionsPrune | toString | quote }}
+  EXECUTIONS_DATA_MAX_AGE: {{ .Values.config.executionsMaxAge | toString | quote }}
+  EXECUTIONS_DATA_PRUNE_MAX_COUNT: {{ .Values.config.executionsPruneMaxCount | toString | quote }}
+  EXECUTIONS_DATA_SAVE_ON_ERROR: {{ .Values.config.executionsSaveOnError | quote }}
+  EXECUTIONS_DATA_SAVE_ON_SUCCESS: {{ .Values.config.executionsSaveOnSuccess | quote }}
+  EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: {{ .Values.config.executionsSaveManual | toString | quote }}
+  EXECUTIONS_DATA_PRUNE_SOFT_DELETE_INTERVAL: {{ .Values.config.executionsPruneSoftDeleteInterval | toString | quote }}
+  EXECUTIONS_DATA_PRUNE_HARD_DELETE_INTERVAL: {{ .Values.config.executionsPruneHardDeleteInterval | toString | quote }}
+  # Nodes
+  N8N_PYTHON_ENABLED: {{ .Values.config.pythonEnabled | toString | quote }}
+  {{- if .Values.config.nodesExclude }}
+  NODES_EXCLUDE: {{ .Values.config.nodesExclude | quote }}
+  {{- end }}
+  {{- if .Values.config.nodesInclude }}
+  NODES_INCLUDE: {{ .Values.config.nodesInclude | quote }}
+  {{- end }}
+  # Metrics
+  N8N_METRICS: {{ .Values.config.metrics.enabled | toString | quote }}
+  {{- if .Values.config.metrics.enabled }}
+  N8N_METRICS_PREFIX: {{ .Values.config.metrics.prefix | quote }}
+  N8N_METRICS_INCLUDE_DEFAULT_METRICS: {{ .Values.config.metrics.includeDefaultMetrics | toString | quote }}
+  N8N_METRICS_INCLUDE_WORKFLOW_ID_LABEL: {{ .Values.config.metrics.includeWorkflowIdLabel | toString | quote }}
+  N8N_METRICS_INCLUDE_NODE_TYPE_LABEL: {{ .Values.config.metrics.includeNodeTypeLabel | toString | quote }}
+  N8N_METRICS_INCLUDE_API_ENDPOINTS: {{ .Values.config.metrics.includeApiEndpoints | toString | quote }}
+  {{- end }}
+  # SMTP
+  {{- if .Values.config.smtp.enabled }}
+  N8N_EMAIL_MODE: smtp
+  N8N_SMTP_HOST: {{ required "config.smtp.host is required when smtp.enabled" .Values.config.smtp.host | quote }}
+  N8N_SMTP_PORT: {{ .Values.config.smtp.port | toString | quote }}
+  {{- if .Values.config.smtp.user }}
+  N8N_SMTP_USER: {{ .Values.config.smtp.user | quote }}
+  {{- end }}
+  {{- if .Values.config.smtp.sender }}
+  N8N_SMTP_SENDER: {{ .Values.config.smtp.sender | quote }}
+  {{- end }}
+  N8N_SMTP_SSL: {{ .Values.config.smtp.ssl | toString | quote }}
+  N8N_SMTP_STARTTLS: {{ .Values.config.smtp.startTls | toString | quote }}
+  {{- end }}
+  # User management
+  N8N_USER_MANAGEMENT_JWT_DURATION_HOURS: {{ .Values.config.userManagement.jwtDurationHours | toString | quote }}
+  {{- if gt (.Values.config.userManagement.jwtRefreshTimeoutHours | int) 0 }}
+  N8N_USER_MANAGEMENT_JWT_REFRESH_TIMEOUT_HOURS: {{ .Values.config.userManagement.jwtRefreshTimeoutHours | toString | quote }}
+  {{- end }}
+  # License
+  {{- if .Values.config.license.activationKey }}
+  N8N_LICENSE_ACTIVATION_KEY: {{ .Values.config.license.activationKey | quote }}
+  {{- end }}
+  {{- if .Values.config.license.serverUrl }}
+  N8N_LICENSE_SERVER_URL: {{ .Values.config.license.serverUrl | quote }}
+  {{- end }}
+  # Queue (executionsMode=queue)
+  {{- if eq .Values.config.executionsMode "queue" }}
+  {{- if .Values.queue.redis.host }}
+  QUEUE_BULL_REDIS_HOST: {{ .Values.queue.redis.host | quote }}
+  QUEUE_BULL_REDIS_PORT: {{ .Values.queue.redis.port | toString | quote }}
+  QUEUE_BULL_REDIS_DB: {{ .Values.queue.redis.db | toString | quote }}
+  QUEUE_BULL_REDIS_TLS: {{ .Values.queue.redis.tls | toString | quote }}
+  {{- if .Values.queue.redis.username }}
+  QUEUE_BULL_REDIS_USERNAME: {{ .Values.queue.redis.username | quote }}
+  {{- end }}
+  {{- if .Values.queue.redis.prefix }}
+  QUEUE_BULL_PREFIX: {{ .Values.queue.redis.prefix | quote }}
+  {{- end }}
+  QUEUE_BULL_REDIS_TIMEOUT_THRESHOLD: {{ .Values.queue.redis.timeoutThreshold | toString | quote }}
+  {{- end }}
+  {{- end }}
+  # Task runner
+  {{- if .Values.runner.enabled }}
+  N8N_RUNNERS_ENABLED: "true"
+  N8N_RUNNERS_MODE: external
+  # broker must listen on 0.0.0.0; default 127.0.0.1 blocks cross-pod connections
+  N8N_RUNNERS_BROKER_LISTEN_ADDRESS: "0.0.0.0"
+  N8N_RUNNERS_MAX_CONCURRENCY: {{ .Values.runner.concurrency | toString | quote }}
+  N8N_RUNNERS_TASK_TIMEOUT: {{ .Values.runner.taskTimeout | toString | quote }}
+  {{- end }}

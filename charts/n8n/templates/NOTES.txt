@@ -1,0 +1,22 @@
+n8n {{ .Chart.AppVersion }} deployed.
+
+{{- if .Values.config.host }}
+Editor: {{ .Values.config.protocol }}://{{ .Values.config.host }}
+{{- else }}
+WARNING: config.host is not set — n8n may not be reachable externally.
+{{- end }}
+
+{{- if .Values.nodePort.enabled }}
+NodePort: http://<node-ip>:{{ .Values.nodePort.port }}
+{{- end }}
+
+{{- if .Values.runner.enabled }}
+Task runner: external mode ({{ .Values.runner.image.repository }}:{{ include "n8n.runnerImageTag" . }})
+  Types: {{ join ", " .Values.runner.types }}
+  Replicas: {{ .Values.runner.replicaCount }}
+{{- else }}
+Task runner: disabled — JavaScript and Python Code nodes will use n8n's internal runner.
+{{- end }}
+
+Secret required: {{ .Values.existingSecret }}
+  Keys: db_password, encryption_key{{ if .Values.runner.enabled }}, runner_auth_token{{ end }}{{ if .Values.config.smtp.enabled }}, smtp_password{{ end }}{{ if .Values.config.userManagement.jwtSecretFromExistingSecret }}, user_management_jwt_secret{{ end }}

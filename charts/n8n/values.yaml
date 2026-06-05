@@ -1,0 +1,225 @@
+image:
+  repository: n8nio/n8n
+  tag: ""  # blank = Chart.AppVersion
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+# RWO PVC requires Recreate
+deploymentStrategy: Recreate
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+# ── Core ─────────────────────────────────────────────────────────────────────
+
+config:
+  host: ""        # required; public hostname
+  protocol: https
+  editorBaseUrl: ""     # blank = protocol+host
+  webhookUrl: ""
+  proxyHops: 0          # hops before n8n (1 = Cloudflare Tunnel)
+  port: 5678
+  listenAddress: "0.0.0.0"
+  path: "/"
+  gracefulShutdownTimeout: 30  # seconds
+  timezone: "UTC"       # GENERIC_TIMEZONE; sets timezone for cron/schedule triggers
+
+  # ── UI / notifications ──
+  disableUi: false
+  templatesEnabled: true
+  versionNotificationsEnabled: true
+  personalizationEnabled: true
+  diagnosticsEnabled: false
+  hiringBannerEnabled: false
+
+  # ── Public API ──
+  publicApiDisabled: false
+  publicApiSwaggerUiDisabled: false
+  publicApiEndpoint: "api"
+
+  # ── Settings file ──
+  enforceSettingsFilePermissions: true
+  migrateFsStoragePath: true  # renames binaryData -> storage (n8n v3 prep)
+
+  # ── Security ──
+  blockEnvAccessInNode: false
+  gitNodeDisableBareRepos: true
+  secureCookie: true
+  samesiteCookie: "lax"      # strict | lax | none
+  restrictFileAccessTo: ""   # comma-separated paths
+
+  # ── Logging ──
+  logLevel: info              # debug | info | warn | error
+  logOutput: console          # console | file | console,file
+  # only when logOutput includes "file"
+  logFileLocation: "/home/node/.n8n/logs/n8n.log"
+  logFileMaxSize: 16          # MB
+  logFileMaxCount: 100
+
+  # ── Binary data ──
+  binaryData:
+    mode: default           # default (memory) | filesystem | s3
+    # only when mode: filesystem
+    localStoragePath: ""
+
+  # ── Executions ──
+  executionsMode: main        # main | queue (requires Redis)
+  executionsTimeout: -1       # seconds; -1 = unlimited
+  executionsTimeoutMax: 3600
+  concurrencyProductionLimit: -1
+  # Pruning
+  executionsPrune: true
+  executionsMaxAge: 336       # hours (14 days)
+  executionsPruneMaxCount: 10000
+  executionsSaveOnError: all    # all | none
+  executionsSaveOnSuccess: all  # all | none
+  executionsSaveManual: true
+  executionsPruneSoftDeleteInterval: 60   # minutes
+  executionsPruneHardDeleteInterval: 15   # minutes
+
+  # ── Nodes ──
+  pythonEnabled: false
+  nodesExclude: ""
+  nodesInclude: ""
+
+  # ── Metrics (Prometheus) ──
+  metrics:
+    enabled: false
+    prefix: "n8n_"
+    includeDefaultMetrics: true
+    includeWorkflowIdLabel: false
+    includeNodeTypeLabel: false
+    includeApiEndpoints: false
+
+  # ── SMTP / email ──
+  # Enables password reset, invites, and 2FA emails.
+  # Add smtp_password to existingSecret when enabling this.
+  smtp:
+    enabled: false
+    host: ""
+    port: 587
+    user: ""
+    sender: ""     # e.g. "n8n <noreply@example.com>"
+    ssl: false
+    startTls: true
+
+  # ── User management ──
+  # Keeps sessions alive across pod restarts: add user_management_jwt_secret to
+  # existingSecret, then set jwtSecretFromExistingSecret: true.
+  # n8n regenerates the secret each pod start otherwise, logging out all users.
+  userManagement:
+    jwtSecretFromExistingSecret: false
+    jwtDurationHours: 168
+    jwtRefreshTimeoutHours: 0   # 0 = auto (25% of jwtDurationHours)
+
+  # ── License ──
+  license:
+    activationKey: ""
+    serverUrl: ""
+
+# ── Database ─────────────────────────────────────────────────────────────────
+
+database:
+  host: ""  # required
+  port: 5432
+  name: n8n
+  user: n8n
+  schema: public
+  poolSize: 2
+  ssl:
+    enabled: true
+    rejectUnauthorized: false
+    ca: ""
+    cert: ""
+    key: ""
+
+# ── Queue mode (executionsMode=queue) ────────────────────────────────────────
+
+queue:
+  redis:
+    host: ""
+    port: 6379
+    password: ""
+    db: 0
+    username: ""
+    tls: false
+    prefix: ""
+    timeoutThreshold: 10000  # ms
+
+# ── Secrets ──────────────────────────────────────────────────────────────────
+
+# Secret in the same namespace.
+# Keys: db_password, encryption_key
+# + runner_auth_token            when runner.enabled
+# + smtp_password                when config.smtp.enabled
+# + user_management_jwt_secret   when config.userManagement.jwtSecretFromExistingSecret
+existingSecret: ""
+
+# ── Task runner ──────────────────────────────────────────────────────────────
+
+# n8nio/runners ships JavaScript and Python 3.13 runners in one image.
+# Use a custom image only to pre-install extra Python packages.
+
+runner:
+  enabled: true
+  replicaCount: 1
+  # Drop python to skip the Python runner and reduce memory usage.
+  types:
+    - javascript
+    - python
+  image:
+    repository: n8nio/runners
+    tag: ""  # blank = Chart.AppVersion
+    pullPolicy: IfNotPresent
+  concurrency: 5
+  taskTimeout: 300          # seconds; runner restarts tasks exceeding this
+  autoShutdownTimeout: 15   # seconds idle before runner subprocess shuts down
+  logLevel: info            # debug | info | warn | error
+  # Python runner permissions (n8n-task-runners.json env-overrides)
+  python:
+    stdlibAllow: ""         # stdlib modules allowed; "*" = all
+    externalAllow: ""       # third-party packages allowed; "*" = all
+  resources: {}
+  podAnnotations: {}
+
+# ── Persistence ──────────────────────────────────────────────────────────────
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  existingClaim: ""
+
+# ── Services ─────────────────────────────────────────────────────────────────
+
+service:
+  type: ClusterIP
+  port: 80
+
+nodePort:
+  enabled: false
+  port: 30678
+
+# ── Kubernetes ───────────────────────────────────────────────────────────────
+
+serviceAccount:
+  create: false
+  name: ""
+
+resources: {}
+#  requests:
+#    memory: 512Mi
+#    cpu: 250m
+#  limits:
+#    memory: 1Gi
+#    cpu: 1000m
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+extraEnv: []
+runnerExtraEnv: []

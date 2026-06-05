@@ -1,0 +1,90 @@
+{{- if .Values.runner.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "n8n.fullname" . }}-runner
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "n8n.runnerLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.runner.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "n8n.runnerSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "n8n.runnerSelectorLabels" . | nindent 8 }}
+      {{- with .Values.runner.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: runner
+          image: "{{ .Values.runner.image.repository }}:{{ include "n8n.runnerImageTag" . }}"
+          imagePullPolicy: {{ .Values.runner.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          # Overrides image CMD. Types: javascript, python (both in n8nio/runners).
+          args:
+            {{- range .Values.runner.types }}
+            - {{ . | quote }}
+            {{- end }}
+          env:
+            - name: N8N_RUNNERS_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: runner_auth_token
+            - name: N8N_RUNNERS_TASK_BROKER_URI
+              value: "http://{{ include "n8n.fullname" . }}:5679"
+            - name: N8N_RUNNERS_MAX_CONCURRENCY
+              value: {{ .Values.runner.concurrency | toString | quote }}
+            - name: N8N_RUNNERS_TASK_TIMEOUT
+              value: {{ .Values.runner.taskTimeout | toString | quote }}
+            - name: N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT
+              value: {{ .Values.runner.autoShutdownTimeout | toString | quote }}
+            - name: N8N_RUNNERS_LAUNCHER_LOG_LEVEL
+              value: {{ .Values.runner.logLevel | quote }}
+            - name: GENERIC_TIMEZONE
+              value: {{ .Values.config.timezone | quote }}
+            {{- if .Values.runner.python.stdlibAllow }}
+            - name: N8N_RUNNERS_STDLIB_ALLOW
+              value: {{ .Values.runner.python.stdlibAllow | quote }}
+            {{- end }}
+            {{- if .Values.runner.python.externalAllow }}
+            - name: N8N_RUNNERS_EXTERNAL_ALLOW
+              value: {{ .Values.runner.python.externalAllow | quote }}
+            {{- end }}
+            {{- with .Values.runnerExtraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: health
+              containerPort: 5680
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          {{- with .Values.runner.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

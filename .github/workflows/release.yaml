@@ -1,0 +1,57 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint charts
+        run: |
+          for chart in charts/*/; do
+            echo "Linting $chart"
+            helm lint "$chart"
+          done
+
+      - name: Package changed charts
+        id: package
+        run: |
+          mkdir -p /tmp/charts
+          git diff --name-only HEAD~1 HEAD -- charts/ \
+            | grep "charts/[^/]*/" \
+            | sed 's|charts/\([^/]*\)/.*|\1|' \
+            | sort -u \
+            | while read chart; do
+                echo "Packaging charts/$chart"
+                helm package "charts/$chart" -d /tmp/charts/
+              done
+          ls /tmp/charts/
+
+      - name: Push to OCI registry
+        env:
+          OCI_REGISTRY: ${{ secrets.OCI_REGISTRY }}
+          OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
+          OCI_PASSWORD: ${{ secrets.OCI_PASSWORD }}
+          OCI_REPO_PATH: ${{ secrets.OCI_REPO_PATH }}
+        run: |
+          helm registry login "$OCI_REGISTRY" \
+            -u "$OCI_USERNAME" \
+            -p "$OCI_PASSWORD"
+          for tgz in /tmp/charts/*.tgz; do
+            [ -f "$tgz" ] || continue
+            echo "Pushing $tgz"
+            helm push "$tgz" "oci://${OCI_REGISTRY}/${OCI_REPO_PATH}"
+          done
