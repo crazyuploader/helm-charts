@@ -14,6 +14,8 @@ data:
   DB_POSTGRESDB_USER: {{ .Values.database.user | quote }}
   DB_POSTGRESDB_SCHEMA: {{ .Values.database.schema | quote }}
   DB_POSTGRESDB_POOL_SIZE: {{ .Values.database.poolSize | toString | quote }}
+  DB_POSTGRESDB_CONNECTION_TIMEOUT: {{ .Values.database.connectionTimeout | toString | quote }}
+  DB_POSTGRESDB_IDLE_CONNECTION_TIMEOUT: {{ .Values.database.idleConnectionTimeout | toString | quote }}
   DB_POSTGRESDB_SSL_ENABLED: {{ .Values.database.ssl.enabled | toString | quote }}
   DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: {{ .Values.database.ssl.rejectUnauthorized | toString | quote }}
   {{- if .Values.database.ssl.ca }}
@@ -86,8 +88,13 @@ data:
   EXECUTIONS_DATA_SAVE_ON_ERROR: {{ .Values.config.executionsSaveOnError | quote }}
   EXECUTIONS_DATA_SAVE_ON_SUCCESS: {{ .Values.config.executionsSaveOnSuccess | quote }}
   EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: {{ .Values.config.executionsSaveManual | toString | quote }}
+  EXECUTIONS_DATA_SAVE_ON_PROGRESS: {{ .Values.config.executionsSaveOnProgress | toString | quote }}
   EXECUTIONS_DATA_PRUNE_SOFT_DELETE_INTERVAL: {{ .Values.config.executionsPruneSoftDeleteInterval | toString | quote }}
   EXECUTIONS_DATA_PRUNE_HARD_DELETE_INTERVAL: {{ .Values.config.executionsPruneHardDeleteInterval | toString | quote }}
+  N8N_WORKFLOW_AUTODEACTIVATION_ENABLED: {{ .Values.config.workflowAutodeactivation | toString | quote }}
+  {{- if .Values.config.workflowAutodeactivation }}
+  N8N_WORKFLOW_AUTODEACTIVATION_MAX_LAST_EXECUTIONS: {{ .Values.config.workflowAutodeactivationMaxExecutions | toString | quote }}
+  {{- end }}
   # Nodes
   N8N_PYTHON_ENABLED: {{ .Values.config.pythonEnabled | toString | quote }}
   {{- if .Values.config.nodesExclude }}
@@ -95,6 +102,12 @@ data:
   {{- end }}
   {{- if .Values.config.nodesInclude }}
   NODES_INCLUDE: {{ .Values.config.nodesInclude | quote }}
+  {{- end }}
+  {{- if .Values.config.nodesFunctionAllowBuiltin }}
+  NODE_FUNCTION_ALLOW_BUILTIN: {{ .Values.config.nodesFunctionAllowBuiltin | quote }}
+  {{- end }}
+  {{- if .Values.config.nodesFunctionAllowExternal }}
+  NODE_FUNCTION_ALLOW_EXTERNAL: {{ .Values.config.nodesFunctionAllowExternal | quote }}
   {{- end }}
   # Metrics
   N8N_METRICS: {{ .Values.config.metrics.enabled | toString | quote }}
@@ -153,6 +166,8 @@ data:
   N8N_RUNNERS_MODE: external
   # broker must listen on 0.0.0.0; default 127.0.0.1 blocks cross-pod connections
   N8N_RUNNERS_BROKER_LISTEN_ADDRESS: "0.0.0.0"
+  N8N_RUNNERS_BROKER_PORT: {{ .Values.runner.brokerPort | toString | quote }}
   N8N_RUNNERS_MAX_CONCURRENCY: {{ .Values.runner.concurrency | toString | quote }}
   N8N_RUNNERS_TASK_TIMEOUT: {{ .Values.runner.taskTimeout | toString | quote }}
+  N8N_RUNNERS_MAX_PAYLOAD: {{ .Values.runner.maxPayload | toString | quote }}
   {{- end }}

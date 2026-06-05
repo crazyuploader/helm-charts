@@ -15,7 +15,7 @@ spec:
       targetPort: http
     {{- if .Values.runner.enabled }}
     - name: task-broker
-      port: 5679
+      port: {{ .Values.runner.brokerPort }}
       targetPort: task-broker
     {{- end }}
 ---

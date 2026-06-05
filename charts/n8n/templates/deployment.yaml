@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: false # n8n writes tmp files to container FS; add tmpfs mounts before enabling
             capabilities:
               drop: ["ALL"]
           ports:
@@ -42,7 +42,7 @@ spec:
               containerPort: {{ .Values.config.port }}
             {{- if .Values.runner.enabled }}
             - name: task-broker
-              containerPort: 5679
+              containerPort: {{ .Values.runner.brokerPort }}
             {{- end }}
           envFrom:
             - configMapRef:
@@ -59,7 +59,7 @@ spec:
                   name: {{ .Values.existingSecret }}
                   key: encryption_key
             {{- if .Values.runner.enabled }}
-            - name: N8N_RUNNERS_SERVER_AUTH_TOKEN
+            - name: N8N_RUNNERS_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.existingSecret }}
@@ -79,12 +79,20 @@ spec:
                   name: {{ .Values.existingSecret }}
                   key: user_management_jwt_secret
             {{- end }}
-            {{- if and (eq .Values.config.executionsMode "queue") .Values.queue.redis.password }}
+            {{- if eq .Values.config.executionsMode "queue" }}
+            {{- if .Values.queue.redis.passwordFromExistingSecret }}
+            - name: QUEUE_BULL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "existingSecret required when queue.redis.passwordFromExistingSecret is true" .Values.existingSecret }}
+                  key: redis_password
+            {{- else if .Values.queue.redis.password }}
             - name: QUEUE_BULL_REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "n8n.fullname" . }}-queue
                   key: QUEUE_BULL_REDIS_PASSWORD
+            {{- end }}
             {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}

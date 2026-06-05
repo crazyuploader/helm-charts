@@ -30,7 +30,7 @@ spec:
           imagePullPolicy: {{ .Values.runner.image.pullPolicy }}
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: false # runner writes tmp files; add tmpfs mounts before enabling
             capabilities:
               drop: ["ALL"]
           # Overrides image CMD. Types: javascript, python (both in n8nio/runners).
@@ -45,7 +45,7 @@ spec:
                   name: {{ .Values.existingSecret }}
                   key: runner_auth_token
             - name: N8N_RUNNERS_TASK_BROKER_URI
-              value: "http://{{ include "n8n.fullname" . }}:5679"
+              value: "http://{{ include "n8n.fullname" . }}:{{ .Values.runner.brokerPort }}"
             - name: N8N_RUNNERS_MAX_CONCURRENCY
               value: {{ .Values.runner.concurrency | toString | quote }}
             - name: N8N_RUNNERS_TASK_TIMEOUT
@@ -63,6 +63,16 @@ spec:
             {{- if .Values.runner.python.externalAllow }}
             - name: N8N_RUNNERS_EXTERNAL_ALLOW
               value: {{ .Values.runner.python.externalAllow | quote }}
+            {{- end }}
+            - name: N8N_RUNNERS_MAX_PAYLOAD
+              value: {{ .Values.runner.maxPayload | toString | quote }}
+            {{- if .Values.runner.javascript.builtinAllow }}
+            - name: NODE_FUNCTION_ALLOW_BUILTIN
+              value: {{ .Values.runner.javascript.builtinAllow | quote }}
+            {{- end }}
+            {{- if .Values.runner.javascript.externalAllow }}
+            - name: NODE_FUNCTION_ALLOW_EXTERNAL
+              value: {{ .Values.runner.javascript.externalAllow | quote }}
             {{- end }}
             {{- with .Values.runnerExtraEnv }}
             {{- toYaml . | nindent 12 }}

@@ -65,7 +65,7 @@ config:
     localStoragePath: ""
 
   # ── Executions ──
-  executionsMode: main # main | queue (requires Redis)
+  executionsMode: regular # regular | queue (requires Redis)
   executionsTimeout: -1 # seconds; -1 = unlimited
   executionsTimeoutMax: 3600
   concurrencyProductionLimit: -1
@@ -76,13 +76,22 @@ config:
   executionsSaveOnError: all # all | none
   executionsSaveOnSuccess: all # all | none
   executionsSaveManual: true
+  executionsSaveOnProgress: false
   executionsPruneSoftDeleteInterval: 60 # minutes
   executionsPruneHardDeleteInterval: 15 # minutes
+  # Auto-unpublish workflows after repeated crash loops
+  workflowAutodeactivation: false
+  workflowAutodeactivationMaxExecutions: 3
 
   # ── Nodes ──
+  # false when runner.enabled: Python Code node runs in the external runner.
   pythonEnabled: false
   nodesExclude: ""
   nodesInclude: ""
+  # JS Code node import allowlists for internal runner mode.
+  # External runner: set runner.javascript.builtinAllow / externalAllow.
+  nodesFunctionAllowBuiltin: ""  # e.g. "fs,path" or "*"
+  nodesFunctionAllowExternal: "" # e.g. "lodash,moment"
 
   # ── Metrics (Prometheus) ──
   metrics:
@@ -128,6 +137,8 @@ database:
   user: n8n
   schema: public
   poolSize: 2
+  connectionTimeout: 20000    # ms; connection wait limit
+  idleConnectionTimeout: 30000 # ms; idle connection eviction threshold
   ssl:
     enabled: true
     rejectUnauthorized: false
@@ -141,7 +152,10 @@ queue:
   redis:
     host: ""
     port: 6379
+    # WARNING: Helm stores this in release history as plaintext.
+    # Set passwordFromExistingSecret: true and add redis_password to existingSecret.
     password: ""
+    passwordFromExistingSecret: false
     db: 0
     username: ""
     tls: false
@@ -155,6 +169,7 @@ queue:
 # + runner_auth_token            when runner.enabled
 # + smtp_password                when config.smtp.enabled
 # + user_management_jwt_secret   when config.userManagement.jwtSecretFromExistingSecret
+# + redis_password               when queue.redis.passwordFromExistingSecret
 existingSecret: ""
 
 # ── Task runner ──────────────────────────────────────────────────────────────
@@ -173,10 +188,16 @@ runner:
     repository: n8nio/runners
     tag: "" # blank = Chart.AppVersion
     pullPolicy: IfNotPresent
+  brokerPort: 5679
+  maxPayload: "1073741824" # bytes; cap for task broker ↔ runner messages (default 1 GiB)
   concurrency: 5
   taskTimeout: 300 # seconds; runner restarts tasks exceeding this
   autoShutdownTimeout: 15 # seconds idle before runner subprocess shuts down
   logLevel: info # debug | info | warn | error
+  # JavaScript runner import allowlists
+  javascript:
+    builtinAllow: ""  # stdlib modules allowed; "*" = all; e.g. "fs,path"
+    externalAllow: "" # third-party packages; "*" = all
   # Python runner permissions (n8n-task-runners.json env-overrides)
   python:
     stdlibAllow: "" # stdlib modules allowed; "*" = all
@@ -206,7 +227,7 @@ nodePort:
 # ── Kubernetes ───────────────────────────────────────────────────────────────
 
 serviceAccount:
-  create: false
+  create: true
   name: ""
 
 resources: {}
