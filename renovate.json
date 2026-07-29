@@ -8,12 +8,13 @@
       "matchStrings": ["appVersion:\\s*\"(?<currentValue>.*?)\""],
       "depNameTemplate": "n8nio/n8n",
       "datasourceTemplate": "docker",
-      "versioningTemplate": "loose"
+      "versioningTemplate": "semver-coerced"
     }
   ],
   "packageRules": [
     {
       "matchDepNames": ["n8nio/n8n"],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
       "bumpVersion": "patch",
       "automerge": true,
       "automergeType": "pr",
