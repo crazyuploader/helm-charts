@@ -1,0 +1,47 @@
+# Minimal Postgres instance for chart-testing's `ct install` job.
+# Plain manifests instead of a Helm chart to avoid depending on any
+# third-party chart repo's availability/support lifecycle.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-ci-postgresql
+  labels:
+    app: n8n-ci-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n-ci-postgresql
+  template:
+    metadata:
+      labels:
+        app: n8n-ci-postgresql
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_USER
+              value: "n8n"
+            - name: POSTGRES_PASSWORD
+              value: "ci-password"
+            - name: POSTGRES_DB
+              value: "n8n"
+          ports:
+            - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "n8n"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n-ci-postgresql
+spec:
+  selector:
+    app: n8n-ci-postgresql
+  ports:
+    - port: 5432
+      targetPort: 5432

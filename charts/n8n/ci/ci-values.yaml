@@ -1,0 +1,29 @@
+# Values used by `ct install` in CI (see .github/workflows/chart-test.yaml).
+# Assumes a Postgres instance and the "n8n-ci-secret" Secret already exist
+# in the test namespace (provisioned by the workflow before ct install runs).
+config:
+  host: "n8n.ci.local"
+
+database:
+  host: "n8n-ci-postgresql"
+  name: "n8n"
+  user: "n8n"
+  ssl:
+    enabled: false
+
+existingSecret: "n8n-ci-secret"
+
+persistence:
+  enabled: false
+
+runner:
+  enabled: true
+  replicaCount: 1
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 500m

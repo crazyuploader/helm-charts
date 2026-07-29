@@ -2,8 +2,8 @@ apiVersion: v2
 name: n8n
 description: Helm chart for n8n workflow automation
 type: application
-version: 0.1.1
-appVersion: "2.25.4"
+version: 0.1.2
+appVersion: "2.32.6"
 keywords:
   - n8n
   - workflow
@@ -24,5 +24,4 @@ annotations:
     - name: source
       url: https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n
   artifacthub.io/changes: |
-    - Remove deprecated N8N_RUNNERS_ENABLED env var
-    - Add OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true when runner + queue mode enabled
+    - Bump n8n appVersion to 2.32.6

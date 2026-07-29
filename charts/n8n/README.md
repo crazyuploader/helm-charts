@@ -4,7 +4,7 @@ Deploys [n8n](https://n8n.io) with PostgreSQL, external task runners (JavaScript
 
 | Chart version | App version |
 | ------------- | ----------- |
-| 0.1.0         | 2.25.4      |
+| 0.1.2         | 2.32.6      |
 
 ## Prerequisites
 

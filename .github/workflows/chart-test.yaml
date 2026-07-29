@@ -1,0 +1,93 @@
+name: Test Charts
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+      - "ct.yaml"
+      - ".github/workflows/chart-test.yaml"
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+      - "ct.yaml"
+      - ".github/workflows/chart-test.yaml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.7.0
+
+      - name: Detect changed charts
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml)
+          echo "changed=$([ -n "$changed" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Lint changed charts
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --config ct.yaml
+
+  install:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.7.0
+
+      - name: Detect changed charts
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml)
+          echo "changed=$([ -n "$changed" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.12.0
+
+      - name: Install Postgres for n8n
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          kubectl apply -f .github/ci/postgres.yaml
+          kubectl rollout status deployment/n8n-ci-postgresql --timeout=180s
+
+      - name: Create n8n secret
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          kubectl create secret generic n8n-ci-secret \
+            --from-literal=db_password=ci-password \
+            --from-literal=encryption_key="$(openssl rand -hex 32)" \
+            --from-literal=runner_auth_token="$(openssl rand -hex 32)"
+
+      - name: Run chart-testing install
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct install --config ct.yaml
