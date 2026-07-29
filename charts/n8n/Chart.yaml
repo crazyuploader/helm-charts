@@ -3,7 +3,7 @@ name: n8n
 description: Helm chart for n8n workflow automation
 type: application
 version: 0.1.2
-appVersion: "2.32.6"
+appVersion: "236-cloud-fixes"
 keywords:
   - n8n
   - workflow
