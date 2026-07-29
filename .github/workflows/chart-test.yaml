@@ -1,18 +1,10 @@
 name: Test Charts
 
 on:
-  pull_request:
-    paths:
-      - "charts/**"
-      - "ct.yaml"
-      - ".github/workflows/chart-test.yaml"
+  pull_request: {}
   push:
     branches:
       - main
-    paths:
-      - "charts/**"
-      - "ct.yaml"
-      - ".github/workflows/chart-test.yaml"
 
 jobs:
   lint:
