@@ -6,14 +6,15 @@
       "customType": "regex",
       "managerFilePatterns": ["/^charts/n8n/Chart\\.yaml$/"],
       "matchStrings": ["appVersion:\\s*\"(?<currentValue>.*?)\""],
-      "depNameTemplate": "n8nio/n8n",
-      "datasourceTemplate": "docker",
+      "depNameTemplate": "n8n-io/n8n",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^n8n@(?<version>.*)$",
       "versioningTemplate": "semver-coerced"
     }
   ],
   "packageRules": [
     {
-      "matchDepNames": ["n8nio/n8n"],
+      "matchDepNames": ["n8n-io/n8n"],
       "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
       "bumpVersion": "patch",
       "automerge": true,
