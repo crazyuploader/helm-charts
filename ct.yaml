@@ -3,5 +3,6 @@ target-branch: main
 chart-dirs:
   - charts
 helm-extra-args: --timeout 600s
+lint-conf: lintconf.yaml
 validate-maintainers: false
 check-version-increment: true
