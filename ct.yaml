@@ -8,5 +8,8 @@ lint-conf: lintconf.yaml
 # n8n-ci-secret that charts/n8n/ci/ci-values.yaml expects. Without this, ct
 # installs each release into its own random namespace, where neither exists.
 namespace: n8n-ci
+# ct rejects namespace without release-label. This label selects the resources
+# of a release when ct prints events, pod details, and logs after a failure.
+release-label: app.kubernetes.io/instance
 validate-maintainers: false
 check-version-increment: true
