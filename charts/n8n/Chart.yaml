@@ -2,7 +2,7 @@ apiVersion: v2
 name: n8n
 description: Helm chart for n8n workflow automation
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "2.32.6"
 keywords:
   - n8n
@@ -24,4 +24,4 @@ annotations:
     - name: source
       url: https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n
   artifacthub.io/changes: |
-    - Bump n8n appVersion to 2.32.6
+    - Set the Postgres SSL variables only when database.ssl.enabled is true

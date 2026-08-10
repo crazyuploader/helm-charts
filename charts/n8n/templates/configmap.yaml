@@ -17,6 +17,10 @@ data:
   DB_POSTGRESDB_CONNECTION_TIMEOUT: {{ .Values.database.connectionTimeout | toString | quote }}
   DB_POSTGRESDB_IDLE_CONNECTION_TIMEOUT: {{ .Values.database.idleConnectionTimeout | toString | quote }}
   DB_POSTGRESDB_SSL_ENABLED: {{ .Values.database.ssl.enabled | toString | quote }}
+  {{- if .Values.database.ssl.enabled }}
+  {{/* n8n turns SSL on whenever a certificate is given or rejectUnauthorized
+       is false, even if DB_POSTGRESDB_SSL_ENABLED is false. These variables are
+       therefore set only when database.ssl.enabled is true. */}}
   DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: {{ .Values.database.ssl.rejectUnauthorized | toString | quote }}
   {{- if .Values.database.ssl.ca }}
   DB_POSTGRESDB_SSL_CA: {{ .Values.database.ssl.ca | quote }}
@@ -26,6 +30,7 @@ data:
   {{- end }}
   {{- if .Values.database.ssl.key }}
   DB_POSTGRESDB_SSL_KEY: {{ .Values.database.ssl.key | quote }}
+  {{- end }}
   {{- end }}
   # Core
   N8N_HOST: {{ required "config.host is required" .Values.config.host | quote }}
