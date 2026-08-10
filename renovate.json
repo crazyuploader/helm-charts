@@ -16,7 +16,14 @@
     {
       "matchDepNames": ["n8n-io/n8n"],
       "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
-      "bumpVersion": "patch",
+      "bumpVersions": [
+        {
+          "name": "n8n chart version",
+          "filePatterns": ["/^charts/n8n/Chart\\.yaml$/"],
+          "matchStrings": ["\\nversion:\\s*(?<version>\\S+)"],
+          "bumpType": "patch"
+        }
+      ],
       "automerge": true,
       "automergeType": "pr",
       "commitMessageTopic": "n8n appVersion"
