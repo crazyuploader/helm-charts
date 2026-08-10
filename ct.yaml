@@ -4,5 +4,9 @@ chart-dirs:
   - charts
 helm-extra-args: --timeout 600s
 lint-conf: lintconf.yaml
+# Fixed namespace so the workflow can pre-create the Postgres instance and the
+# n8n-ci-secret that charts/n8n/ci/ci-values.yaml expects. Without this, ct
+# installs each release into its own random namespace, where neither exists.
+namespace: n8n-ci
 validate-maintainers: false
 check-version-increment: true

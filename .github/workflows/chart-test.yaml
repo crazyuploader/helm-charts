@@ -69,13 +69,14 @@ jobs:
       - name: Install Postgres for n8n
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          kubectl apply -f .github/ci/postgres.yaml
-          kubectl rollout status deployment/n8n-ci-postgresql --timeout=180s
+          kubectl create namespace n8n-ci
+          kubectl apply -n n8n-ci -f .github/ci/postgres.yaml
+          kubectl rollout status -n n8n-ci deployment/n8n-ci-postgresql --timeout=180s
 
       - name: Create n8n secret
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          kubectl create secret generic n8n-ci-secret \
+          kubectl create secret generic n8n-ci-secret -n n8n-ci \
             --from-literal=db_password=ci-password \
             --from-literal=encryption_key="$(openssl rand -hex 32)" \
             --from-literal=runner_auth_token="$(openssl rand -hex 32)"
