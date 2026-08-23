@@ -347,7 +347,7 @@ aiAssistant:
       # to existingSecret, or set daytonaApiKey directly (not recommended).
       daytonaApiKeyFromExistingSecret: false
       daytonaApiKey: ""
-      image: "daytonaio/sandbox:0.5.0"
+      image: "daytonaio/sandbox:0.10.0"
       snapshot: ""
       timeout: 300000 # milliseconds
       namePrefix: ""
@@ -409,7 +409,7 @@ aiAssistant:
       recordOutputs: true
     sandbox:
       enabled: false
-      image: "daytonaio/sandbox:0.5.0"
+      image: "daytonaio/sandbox:0.10.0"
       snapshot: "daytonaio/sandbox:0.8.0"
       timeout: 300000
       ephemeral: false
