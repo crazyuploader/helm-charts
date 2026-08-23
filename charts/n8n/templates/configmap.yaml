@@ -181,3 +181,102 @@ data:
   N8N_RUNNERS_TASK_TIMEOUT: {{ .Values.runner.taskTimeout | toString | quote }}
   N8N_RUNNERS_MAX_PAYLOAD: {{ .Values.runner.maxPayload | toString | quote }}
   {{- end }}
+  # AI Assistant
+  {{- if and .Values.aiAssistant .Values.aiAssistant.enabled }}
+  N8N_AI_ENABLED: {{ .Values.aiAssistant.enabled | toString | quote }}
+  N8N_AI_TIMEOUT_MAX: {{ .Values.aiAssistant.timeout | toString | quote }}
+  N8N_AI_ALLOW_SENDING_PARAMETER_VALUES: {{ .Values.aiAssistant.allowSendingParameterValues | toString | quote }}
+  {{- if .Values.aiAssistant.instanceAi }}
+  {{- if .Values.aiAssistant.instanceAi.assistantBaseUrl }}
+  N8N_AI_ASSISTANT_BASE_URL: {{ .Values.aiAssistant.instanceAi.assistantBaseUrl | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.instanceAi.enabledModules }}
+  N8N_ENABLED_MODULES: {{ .Values.aiAssistant.instanceAi.enabledModules | quote }}
+  {{- end }}
+  N8N_INSTANCE_AI_MODEL: {{ .Values.aiAssistant.instanceAi.model | quote }}
+  {{- if .Values.aiAssistant.instanceAi.modelUrl }}
+  N8N_INSTANCE_AI_MODEL_URL: {{ .Values.aiAssistant.instanceAi.modelUrl | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.instanceAi.mcpServers }}
+  N8N_INSTANCE_AI_MCP_SERVERS: {{ .Values.aiAssistant.instanceAi.mcpServers | quote }}
+  {{- end }}
+  N8N_INSTANCE_AI_OBSERVER_MESSAGE_TOKENS: {{ .Values.aiAssistant.instanceAi.observerMessageTokens | toString | quote }}
+  N8N_INSTANCE_AI_REFLECTOR_OBSERVATION_TOKENS: {{ .Values.aiAssistant.instanceAi.reflectorObservationTokens | toString | quote }}
+  N8N_INSTANCE_AI_LOCAL_GATEWAY_DISABLED: {{ .Values.aiAssistant.instanceAi.localGatewayDisabled | toString | quote }}
+  N8N_INSTANCE_AI_BROWSER_USE_ENABLED: {{ .Values.aiAssistant.instanceAi.browserUseEnabled | toString | quote }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox.enabled }}
+  N8N_INSTANCE_AI_SANDBOX_ENABLED: {{ .Values.aiAssistant.instanceAi.sandbox.enabled | toString | quote }}
+  N8N_INSTANCE_AI_SANDBOX_PROVIDER: {{ .Values.aiAssistant.instanceAi.sandbox.provider | quote }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox.image }}
+  N8N_INSTANCE_AI_SANDBOX_IMAGE: {{ .Values.aiAssistant.instanceAi.sandbox.image | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox.snapshot }}
+  N8N_INSTANCE_AI_SANDBOX_SNAPSHOT: {{ .Values.aiAssistant.instanceAi.sandbox.snapshot | quote }}
+  {{- end }}
+  N8N_INSTANCE_AI_SANDBOX_TIMEOUT: {{ .Values.aiAssistant.instanceAi.sandbox.timeout | toString | quote }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox.namePrefix }}
+  N8N_INSTANCE_AI_SANDBOX_NAME_PREFIX: {{ .Values.aiAssistant.instanceAi.sandbox.namePrefix | quote }}
+  {{- end }}
+  N8N_INSTANCE_AI_SANDBOX_EPHEMERAL: {{ .Values.aiAssistant.instanceAi.sandbox.ephemeral | toString | quote }}
+  N8N_INSTANCE_AI_SANDBOX_AUTO_STOP_MINUTES: {{ .Values.aiAssistant.instanceAi.sandbox.autoStopMinutes | toString | quote }}
+  N8N_INSTANCE_AI_SANDBOX_AUTO_ARCHIVE_MINUTES: {{ .Values.aiAssistant.instanceAi.sandbox.autoArchiveMinutes | toString | quote }}
+  N8N_INSTANCE_AI_SANDBOX_AUTO_DELETE_MINUTES: {{ .Values.aiAssistant.instanceAi.sandbox.autoDeleteMinutes | toString | quote }}
+  N8N_INSTANCE_AI_DAYTONA_TOKEN_REFRESH_SKEW_MS: {{ .Values.aiAssistant.instanceAi.sandbox.daytonaTokenRefreshSkewMs | toString | quote }}
+  N8N_INSTANCE_AI_BUILDER_SANDBOX_TTL_MS: {{ .Values.aiAssistant.instanceAi.sandbox.builderSandboxTtlMs | toString | quote }}
+  {{- if eq .Values.aiAssistant.instanceAi.sandbox.provider "n8n-sandbox" }}
+  {{- if .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceUrl }}
+  N8N_SANDBOX_SERVICE_URL: {{ .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceUrl | quote }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if and .Values.aiAssistant.instanceAi.sandbox.daytonaApiUrl (or (and .Values.aiAssistant.instanceAi.sandbox.enabled (eq .Values.aiAssistant.instanceAi.sandbox.provider "daytona")) (and .Values.aiAssistant.agents .Values.aiAssistant.agents.sandbox .Values.aiAssistant.agents.sandbox.enabled)) }}
+  DAYTONA_API_URL: {{ .Values.aiAssistant.instanceAi.sandbox.daytonaApiUrl | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.aiAssistant.instanceAi.outputRedaction }}
+  N8N_INSTANCE_AI_OUTPUT_REDACTION_ENABLED: {{ .Values.aiAssistant.instanceAi.outputRedaction.enabled | toString | quote }}
+  N8N_INSTANCE_AI_OUTPUT_REDACTION_SECRETS: {{ .Values.aiAssistant.instanceAi.outputRedaction.secrets | toString | quote }}
+  N8N_INSTANCE_AI_OUTPUT_REDACTION_PII: {{ .Values.aiAssistant.instanceAi.outputRedaction.pii | quote }}
+  N8N_INSTANCE_AI_OUTPUT_REDACTION_PLACEHOLDER: {{ .Values.aiAssistant.instanceAi.outputRedaction.placeholder | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.instanceAi.searxngUrl }}
+  N8N_INSTANCE_AI_SEARXNG_URL: {{ .Values.aiAssistant.instanceAi.searxngUrl | quote }}
+  {{- end }}
+  N8N_INSTANCE_AI_THREAD_TTL_DAYS: {{ .Values.aiAssistant.instanceAi.threadTtlDays | toString | quote }}
+  N8N_INSTANCE_AI_PRUNE_INTERVAL: {{ .Values.aiAssistant.instanceAi.pruneInterval | toString | quote }}
+  N8N_INSTANCE_AI_SNAPSHOT_RETENTION: {{ .Values.aiAssistant.instanceAi.snapshotRetention | toString | quote }}
+  N8N_INSTANCE_AI_CHECKPOINT_GC_RETENTION: {{ .Values.aiAssistant.instanceAi.checkpointGcRetention | toString | quote }}
+  N8N_INSTANCE_AI_CONFIRMATION_TIMEOUT: {{ .Values.aiAssistant.instanceAi.confirmationTimeout | toString | quote }}
+  N8N_INSTANCE_AI_THINKING_ENABLED: {{ .Values.aiAssistant.instanceAi.thinkingEnabled | toString | quote }}
+  N8N_INSTANCE_AI_RUN_DEBUG_ENABLED: {{ .Values.aiAssistant.instanceAi.runDebugEnabled | toString | quote }}
+  N8N_INSTANCE_AI_DURABLE_LOG: {{ .Values.aiAssistant.instanceAi.durableLog | toString | quote }}
+  N8N_INSTANCE_AI_MCP_CONNECTIONS_ENABLED: {{ .Values.aiAssistant.instanceAi.mcpConnectionsEnabled | toString | quote }}
+  N8N_INSTANCE_AI_ACTIVATION_CAPPED: {{ .Values.aiAssistant.instanceAi.activationCapped | toString | quote }}
+  N8N_INSTANCE_AI_ACTIVATION_LOCK_MESSAGE_THRESHOLD: {{ .Values.aiAssistant.instanceAi.activationLockMessageThreshold | toString | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.agents }}
+  {{- if .Values.aiAssistant.agents.enabled }}
+  {{- if .Values.aiAssistant.agents.modules }}
+  N8N_AGENTS_MODULES: {{ .Values.aiAssistant.agents.modules | quote }}
+  {{- end }}
+  N8N_AGENTS_CHECKPOINT_TTL: {{ .Values.aiAssistant.agents.checkpointTtl | toString | quote }}
+  {{- if .Values.aiAssistant.agents.tracing }}
+  N8N_AGENTS_TRACING_ENABLED: {{ .Values.aiAssistant.agents.tracing.enabled | toString | quote }}
+  N8N_AGENTS_TRACING_RECORD_INPUTS: {{ .Values.aiAssistant.agents.tracing.recordInputs | toString | quote }}
+  N8N_AGENTS_TRACING_RECORD_OUTPUTS: {{ .Values.aiAssistant.agents.tracing.recordOutputs | toString | quote }}
+  {{- end }}
+  {{- if .Values.aiAssistant.agents.sandbox }}
+  {{- if .Values.aiAssistant.agents.sandbox.enabled }}
+  N8N_AGENTS_AI_SANDBOX_ENABLED: {{ .Values.aiAssistant.agents.sandbox.enabled | toString | quote }}
+  N8N_AGENTS_AI_SANDBOX_IMAGE: {{ .Values.aiAssistant.agents.sandbox.image | quote }}
+  {{- if .Values.aiAssistant.agents.sandbox.snapshot }}
+  N8N_AGENTS_AI_SANDBOX_SNAPSHOT: {{ .Values.aiAssistant.agents.sandbox.snapshot | quote }}
+  {{- end }}
+  N8N_AGENTS_AI_SANDBOX_TIMEOUT: {{ .Values.aiAssistant.agents.sandbox.timeout | toString | quote }}
+  N8N_AGENTS_AI_SANDBOX_EPHEMERAL: {{ .Values.aiAssistant.agents.sandbox.ephemeral | toString | quote }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}

@@ -13,9 +13,24 @@ NodePort: http://<node-ip>:{{ .Values.nodePort.port }}
 {{- if .Values.runner.enabled }}
 Task runner: external mode ({{ .Values.runner.image.repository }}:{{ include "n8n.runnerImageTag" . }})
   Types: {{ join ", " .Values.runner.types }}
-  Replicas: {{ .Values.runner.replicaCount }}
+  Main task-runner replicas: {{ .Values.runner.replicaCount }}
+{{- if and .Values.worker.enabled (eq .Values.config.executionsMode "queue") }}
+  Worker sidecars: one per workflow worker pod
+{{- end }}
 {{- else }}
 Task runner: disabled — JavaScript and Python Code nodes will use n8n's internal runner.
+{{- end }}
+
+{{- if eq .Values.config.executionsMode "queue" }}
+{{- if .Values.worker.enabled }}
+Workflow worker replicas: {{ .Values.worker.replicaCount }}
+Worker concurrency: {{ .Values.worker.concurrency }} per replica
+{{- else }}
+WARNING: Queue mode is enabled without chart-managed workflow workers. Deploy external workers or set worker.enabled=true.
+{{- end }}
+{{- if eq .Values.config.binaryData.mode "filesystem" }}
+WARNING: Queue mode does not support filesystem binary data. Set config.binaryData.mode=database or configure shared external storage.
+{{- end }}
 {{- end }}
 
 Secret required: {{ .Values.existingSecret }}
