@@ -60,7 +60,7 @@ config:
 
   # ── Binary data ──
   binaryData:
-    mode: default # default (memory) | filesystem | s3
+    mode: filesystem # filesystem | s3 | database (in-memory 'default' mode is deprecated)
     # only when mode: filesystem
     localStoragePath: ""
 
@@ -82,6 +82,15 @@ config:
   # Auto-unpublish workflows after repeated crash loops
   workflowAutodeactivation: false
   workflowAutodeactivationMaxExecutions: 3
+
+  # ── Community packages ──
+  # Default will change to false in a future version; set explicitly to keep current behavior.
+  unverifiedPackagesEnabled: true
+
+  # ── Compression node limits ──
+  # Defaults will be reduced in a future version; set explicitly to keep current limits.
+  compressionNodeMaxDecompressedSizeBytes: "2147483648" # 2 GiB
+  compressionNodeMaxZipEntries: "5000"
 
   # ── Nodes ──
   # false when runner.enabled: Python Code node runs in the external runner.

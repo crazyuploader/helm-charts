@@ -43,7 +43,7 @@ data:
   N8N_GRACEFUL_SHUTDOWN_TIMEOUT: {{ .Values.config.gracefulShutdownTimeout | toString | quote }}
   GENERIC_TIMEZONE: {{ .Values.config.timezone | quote }}
   {{- if .Values.config.webhookUrl }}
-  WEBHOOK_URL: {{ .Values.config.webhookUrl | quote }}
+  N8N_WEBHOOK_URL: {{ .Values.config.webhookUrl | quote }}
   {{- end }}
   # UI / notifications
   N8N_DISABLE_UI: {{ .Values.config.disableUi | toString | quote }}
@@ -82,6 +82,11 @@ data:
   N8N_BINARY_DATA_STORAGE_PATH: {{ .Values.config.binaryData.localStoragePath | quote }}
   {{- end }}
   {{- end }}
+  # Community packages
+  N8N_UNVERIFIED_PACKAGES_ENABLED: {{ .Values.config.unverifiedPackagesEnabled | toString | quote }}
+  # Compression node limits
+  N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES: {{ .Values.config.compressionNodeMaxDecompressedSizeBytes | toString | quote }}
+  N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES: {{ .Values.config.compressionNodeMaxZipEntries | toString | quote }}
   # Executions
   EXECUTIONS_MODE: {{ .Values.config.executionsMode | quote }}
   EXECUTIONS_TIMEOUT: {{ .Values.config.executionsTimeout | toString | quote }}
