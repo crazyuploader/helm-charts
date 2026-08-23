@@ -2,7 +2,7 @@ apiVersion: v2
 name: n8n
 description: Helm chart for n8n workflow automation
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "2.35.7"
 keywords:
   - n8n
@@ -24,11 +24,4 @@ annotations:
     - name: source
       url: https://github.com/crazyuploader/helm-charts/tree/main/charts/n8n
   artifacthub.io/changes: |
-    - Add n8n workflow worker support for queue mode
-    - Add a task runner sidecar to each workflow worker
-    - Add AI Assistant and sandbox configuration support
-    - Support Daytona and n8n-sandbox-service sandbox providers
-    - Add AI-related secrets to existingSecret pattern
-    - Rename deprecated WEBHOOK_URL to N8N_WEBHOOK_URL
-    - Change default binaryData.mode from 'default' to 'filesystem'
-    - Add config for N8N_UNVERIFIED_PACKAGES_ENABLED, N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES, N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES
+    - Update Daytona sandbox image to 0.10.0

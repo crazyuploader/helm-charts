@@ -14,6 +14,7 @@
   ],
   "packageRules": [
     {
+      "description": "Keep n8n chart metadata in sync with n8n releases",
       "matchDepNames": ["n8n-io/n8n"],
       "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
       "bumpVersions": [
@@ -22,11 +23,72 @@
           "filePatterns": ["/^charts/n8n/Chart\\.yaml$/"],
           "matchStrings": ["\\nversion:\\s*(?<version>\\S+)"],
           "bumpType": "patch"
+        },
+        {
+          "name": "n8n chart README version",
+          "filePatterns": ["/^charts/n8n/README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|\\s*\\d+\\.\\d+\\.\\d+\\s*\\|"
+          ],
+          "bumpType": "patch"
+        },
+        {
+          "name": "root README n8n chart version",
+          "filePatterns": ["/^README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*\\[n8n\\]\\(\\.\\/charts\\/n8n\\)\\s*\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|"
+          ],
+          "bumpType": "patch"
+        },
+        {
+          "name": "n8n chart README app version",
+          "filePatterns": ["/^charts/n8n/README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*\\d+\\.\\d+\\.\\d+\\s*\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|"
+          ],
+          "bumpType": "sync"
+        },
+        {
+          "name": "root README n8n app version",
+          "filePatterns": ["/^README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*\\[n8n\\]\\(\\.\\/charts\\/n8n\\)\\s*\\|\\s*\\d+\\.\\d+\\.\\d+\\s*\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|"
+          ],
+          "bumpType": "sync"
         }
       ],
       "automerge": true,
       "automergeType": "pr",
       "commitMessageTopic": "n8n appVersion"
+    },
+    {
+      "description": "Bump n8n chart metadata for Docker image updates",
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["charts/n8n/values.yaml"],
+      "bumpVersions": [
+        {
+          "name": "n8n chart version",
+          "filePatterns": ["/^charts/n8n/Chart\\.yaml$/"],
+          "matchStrings": ["\\nversion:\\s*(?<version>\\S+)"],
+          "bumpType": "patch"
+        },
+        {
+          "name": "n8n chart README version",
+          "filePatterns": ["/^charts/n8n/README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|\\s*\\d+\\.\\d+\\.\\d+\\s*\\|"
+          ],
+          "bumpType": "patch"
+        },
+        {
+          "name": "root README n8n chart version",
+          "filePatterns": ["/^README\\.md$/"],
+          "matchStrings": [
+            "\\|\\s*\\[n8n\\]\\(\\.\\/charts\\/n8n\\)\\s*\\|\\s*(?<version>\\d+\\.\\d+\\.\\d+)\\s*\\|"
+          ],
+          "bumpType": "patch"
+        }
+      ]
     },
     {
       "matchManagers": ["github-actions"],
