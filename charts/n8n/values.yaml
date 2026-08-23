@@ -60,7 +60,7 @@ config:
 
   # ── Binary data ──
   binaryData:
-    mode: filesystem # filesystem | s3 | database (in-memory 'default' mode is deprecated)
+    mode: filesystem # use database or s3 in queue mode; filesystem is not supported
     # only when mode: filesystem
     localStoragePath: ""
 
@@ -171,6 +171,29 @@ queue:
     prefix: ""
     timeoutThreshold: 10000 # ms
 
+# n8n workflow workers consume queued executions from Redis.
+# Enable workers only with config.executionsMode: queue.
+worker:
+  enabled: false
+  replicaCount: 1
+  # config.concurrencyProductionLimit overrides this value when it is not -1.
+  concurrency: 10 # n8n recommends 5 or more
+  healthCheckPort: 5678
+  # Set this value higher than config.gracefulShutdownTimeout.
+  terminationGracePeriodSeconds: 60
+  podAnnotations: {}
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 200m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+
 # ── Secrets ──────────────────────────────────────────────────────────────────
 
 # Secret in the same namespace.
@@ -195,6 +218,8 @@ existingSecret: ""
 
 runner:
   enabled: true
+  # These replicas connect to the main n8n instance. Queue workers get one
+  # task runner sidecar per worker pod.
   replicaCount: 1
   # Drop python to skip the Python runner and reduce memory usage.
   types:
@@ -218,7 +243,13 @@ runner:
   python:
     stdlibAllow: "" # stdlib modules allowed; "*" = all
     externalAllow: "" # third-party packages allowed; "*" = all
-  resources: {}
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
   podAnnotations: {}
 
 # ── Persistence ──────────────────────────────────────────────────────────────
@@ -264,7 +295,7 @@ aiAssistant:
   # Whether AI features (AI nodes and AI assistant) are enabled globally.
   enabled: false
   # Maximum time in milliseconds to wait for an HTTP response from an AI service.
-  timeout: "3600000"  # 1 hour
+  timeout: "3600000" # 1 hour
   # Whether workflow and node parameter values may be sent to AI providers.
   allowSendingParameterValues: true
 
@@ -308,7 +339,7 @@ aiAssistant:
     # Sandbox for code execution (required for AI Assistant)
     sandbox:
       enabled: false
-      provider: daytona  # daytona | n8n-sandbox
+      provider: daytona # daytona | n8n-sandbox
 
       # Configure the Daytona connection for the AI Assistant and Agents sandboxes.
       daytonaApiUrl: ""
@@ -318,12 +349,12 @@ aiAssistant:
       daytonaApiKey: ""
       image: "daytonaio/sandbox:0.5.0"
       snapshot: ""
-      timeout: 300000  # milliseconds
+      timeout: 300000 # milliseconds
       namePrefix: ""
       ephemeral: false
       autoStopMinutes: 15
       autoArchiveMinutes: 60
-      autoDeleteMinutes: 10080  # 7 days
+      autoDeleteMinutes: 10080 # 7 days
       daytonaTokenRefreshSkewMs: "300000"
       builderSandboxTtlMs: "900000"
 
@@ -354,10 +385,10 @@ aiAssistant:
 
     # Thread and persistence settings
     threadTtlDays: 30
-    pruneInterval: "3600000"  # 1 hour in ms
-    snapshotRetention: "86400000"  # 24 hours in ms
-    checkpointGcRetention: "604800000"  # 7 days in ms
-    confirmationTimeout: "86400000"  # 24 hours in ms
+    pruneInterval: "3600000" # 1 hour in ms
+    snapshotRetention: "86400000" # 24 hours in ms
+    checkpointGcRetention: "604800000" # 7 days in ms
+    confirmationTimeout: "86400000" # 24 hours in ms
 
     # Advanced / debug
     thinkingEnabled: true
@@ -371,7 +402,7 @@ aiAssistant:
   agents:
     enabled: false
     modules: ""
-    checkpointTtl: 345600  # seconds
+    checkpointTtl: 345600 # seconds
     tracing:
       enabled: true
       recordInputs: true

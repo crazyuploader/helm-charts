@@ -1,10 +1,10 @@
 # n8n
 
-Deploys [n8n](https://n8n.io) with PostgreSQL, external task runners (JavaScript + Python), and Redis queue mode.
+This chart deploys [n8n](https://n8n.io) with PostgreSQL, workflow workers, external task runners, and Redis queue mode.
 
 | Chart version | App version |
 | ------------- | ----------- |
-| 0.2.0         | 2.35.7      |
+| 0.3.0         | 2.35.7      |
 
 ## Prerequisites
 
@@ -38,27 +38,47 @@ existingSecret: n8n-secret
 | ----------------------------- | ---------------------- | ------------------------------------------------------- |
 | `config.host`                 | `""`                   | required; public hostname                               |
 | `config.timezone`             | `UTC`                  | timezone for cron/schedule triggers                     |
-| `config.executionsMode`       | `main`                 | set to `queue` for Redis-backed workers                 |
+| `config.executionsMode`       | `regular`              | set to `queue` for Redis-backed workers                 |
 | `database.host`               | `""`                   | required; PostgreSQL host                               |
 | `existingSecret`              | `""`                   | required; see prerequisites                             |
+| `worker.enabled`              | `false`                | deploys workflow workers in queue mode                  |
+| `worker.replicaCount`         | `1`                    | number of workflow worker pods                          |
+| `worker.concurrency`          | `10`                   | concurrent workflow jobs per worker                     |
 | `runner.enabled`              | `true`                 | deploys external task runner (JS + Python)              |
 | `runner.types`                | `[javascript, python]` | drop `python` to reduce memory                          |
 | `runner.python.stdlibAllow`   | `""`                   | stdlib modules for Python Code nodes; `"*"` = all       |
 | `runner.python.externalAllow` | `""`                   | third-party packages for Python Code nodes; `"*"` = all |
 | `config.smtp.enabled`         | `false`                | enables password reset, invites, 2FA emails             |
 | `persistence.size`            | `5Gi`                  | PVC size for `/home/node/.n8n`                          |
-| `config.binaryData.mode`      | `default`              | `default` (memory), `filesystem`, or `s3`               |
+| `config.binaryData.mode`      | `filesystem`           | `filesystem`, `database`, or `s3`                       |
 
 ## Queue mode
+
+See the [n8n queue-mode guide](https://docs.n8n.io/deploy/host-n8n/configure-n8n/scaling/enable-queue-mode/).
 
 ```yaml
 config:
   executionsMode: queue
+  binaryData:
+    mode: database
 
 queue:
   redis:
     host: redis.example.com
+
+worker:
+  enabled: true
+  replicaCount: 2
+  concurrency: 10
 ```
+
+The main instance adds executions to Redis. Workflow workers consume and run those executions.
+
+[Task runners](https://docs.n8n.io/deploy/host-n8n/configure-n8n/set-up-task-runners/) only run JavaScript and Python Code-node tasks. When `runner.enabled` is true, each workflow worker gets a task-runner sidecar.
+
+Queue mode does not support filesystem binary data. If your workflows persist binary data, configure shared binary storage.
+
+`config.concurrencyProductionLimit` overrides `worker.concurrency` when its value is not `-1`.
 
 ## SMTP
 

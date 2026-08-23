@@ -71,6 +71,27 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Selector labels — workflow worker deployment.
+*/}}
+{{- define "n8n.workerSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "n8n.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: worker
+{{- end }}
+
+{{/*
+Labels for workflow worker Deployment (component: worker).
+*/}}
+{{- define "n8n.workerLabels" -}}
+helm.sh/chart: {{ include "n8n.chart" . }}
+{{ include "n8n.workerSelectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
 Resolved image tag — falls back to appVersion.
 */}}
 {{- define "n8n.imageTag" -}}

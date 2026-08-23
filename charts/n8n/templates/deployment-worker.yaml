@@ -1,0 +1,204 @@
+{{- if and .Values.worker.enabled (ne .Values.config.executionsMode "queue") }}
+{{- fail "worker.enabled requires config.executionsMode=queue" }}
+{{- end }}
+{{- if .Values.worker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "n8n.fullname" . }}-worker
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "n8n.workerLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "n8n.workerSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "n8n.workerLabels" . | nindent 8 }}
+      {{- with .Values.worker.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "n8n.serviceAccountName" . }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.worker.terminationGracePeriodSeconds }}
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: n8n-worker
+          image: "{{ .Values.image.repository }}:{{ include "n8n.imageTag" . }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - worker
+            - {{ printf "--concurrency=%v" .Values.worker.concurrency | quote }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false # n8n writes tmp files to container FS
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: worker-health
+              containerPort: {{ .Values.worker.healthCheckPort }}
+            {{- if .Values.runner.enabled }}
+            - name: task-broker
+              containerPort: {{ .Values.runner.brokerPort }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "n8n.fullname" . }}
+          env:
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "existingSecret is required" .Values.existingSecret }}
+                  key: db_password
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: encryption_key
+            - name: QUEUE_HEALTH_CHECK_ACTIVE
+              value: "true"
+            - name: QUEUE_HEALTH_CHECK_PORT
+              value: {{ .Values.worker.healthCheckPort | toString | quote }}
+            {{- if .Values.runner.enabled }}
+            - name: N8N_RUNNERS_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: runner_auth_token
+            {{- end }}
+            {{- if .Values.queue.redis.passwordFromExistingSecret }}
+            - name: QUEUE_BULL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "existingSecret required when queue.redis.passwordFromExistingSecret is true" .Values.existingSecret }}
+                  key: redis_password
+            {{- else if .Values.queue.redis.password }}
+            - name: QUEUE_BULL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-queue
+                  key: QUEUE_BULL_REDIS_PASSWORD
+            {{- end }}
+            {{- with .Values.worker.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: worker-health
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /healthz/readiness
+              port: worker-health
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+        {{- if .Values.runner.enabled }}
+        - name: task-runner
+          image: "{{ .Values.runner.image.repository }}:{{ include "n8n.runnerImageTag" . }}"
+          imagePullPolicy: {{ .Values.runner.image.pullPolicy }}
+          args:
+            {{- range .Values.runner.types }}
+            - {{ . | quote }}
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false # runner writes tmp files
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: N8N_RUNNERS_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: runner_auth_token
+            - name: N8N_RUNNERS_TASK_BROKER_URI
+              value: "http://127.0.0.1:{{ .Values.runner.brokerPort }}"
+            - name: N8N_RUNNERS_MAX_CONCURRENCY
+              value: {{ .Values.runner.concurrency | toString | quote }}
+            - name: N8N_RUNNERS_TASK_TIMEOUT
+              value: {{ .Values.runner.taskTimeout | toString | quote }}
+            - name: N8N_RUNNERS_AUTO_SHUTDOWN_TIMEOUT
+              value: {{ .Values.runner.autoShutdownTimeout | toString | quote }}
+            - name: N8N_RUNNERS_LAUNCHER_LOG_LEVEL
+              value: {{ .Values.runner.logLevel | quote }}
+            - name: GENERIC_TIMEZONE
+              value: {{ .Values.config.timezone | quote }}
+            {{- if .Values.runner.python.stdlibAllow }}
+            - name: N8N_RUNNERS_STDLIB_ALLOW
+              value: {{ .Values.runner.python.stdlibAllow | quote }}
+            {{- end }}
+            {{- if .Values.runner.python.externalAllow }}
+            - name: N8N_RUNNERS_EXTERNAL_ALLOW
+              value: {{ .Values.runner.python.externalAllow | quote }}
+            {{- end }}
+            - name: N8N_RUNNERS_MAX_PAYLOAD
+              value: {{ .Values.runner.maxPayload | toString | quote }}
+            {{- if .Values.runner.javascript.builtinAllow }}
+            - name: NODE_FUNCTION_ALLOW_BUILTIN
+              value: {{ .Values.runner.javascript.builtinAllow | quote }}
+            {{- end }}
+            {{- if .Values.runner.javascript.externalAllow }}
+            - name: NODE_FUNCTION_ALLOW_EXTERNAL
+              value: {{ .Values.runner.javascript.externalAllow | quote }}
+            {{- end }}
+            {{- with .Values.runnerExtraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: runner-health
+              containerPort: 5680
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: runner-health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: runner-health
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.runner.resources | nindent 12 }}
+        {{- end }}
+      {{- if .Values.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
+      {{- else if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml .Values.worker.tolerations | nindent 8 }}
+      {{- else if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.affinity }}
+      affinity:
+        {{- toYaml .Values.worker.affinity | nindent 8 }}
+      {{- else if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+{{- end }}
