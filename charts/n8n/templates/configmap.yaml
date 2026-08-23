@@ -182,10 +182,8 @@ data:
   N8N_RUNNERS_MAX_PAYLOAD: {{ .Values.runner.maxPayload | toString | quote }}
   {{- end }}
   # AI Assistant
-  {{- if .Values.aiAssistant }}
-  {{- if .Values.aiAssistant.enabled }}
+  {{- if and .Values.aiAssistant .Values.aiAssistant.enabled }}
   N8N_AI_ENABLED: {{ .Values.aiAssistant.enabled | toString | quote }}
-  {{- end }}
   N8N_AI_TIMEOUT_MAX: {{ .Values.aiAssistant.timeout | toString | quote }}
   N8N_AI_ALLOW_SENDING_PARAMETER_VALUES: {{ .Values.aiAssistant.allowSendingParameterValues | toString | quote }}
   {{- if .Values.aiAssistant.instanceAi }}
@@ -263,9 +261,11 @@ data:
   N8N_AGENTS_MODULES: {{ .Values.aiAssistant.agents.modules | quote }}
   {{- end }}
   N8N_AGENTS_CHECKPOINT_TTL: {{ .Values.aiAssistant.agents.checkpointTtl | toString | quote }}
+  {{- if .Values.aiAssistant.agents.tracing }}
   N8N_AGENTS_TRACING_ENABLED: {{ .Values.aiAssistant.agents.tracing.enabled | toString | quote }}
   N8N_AGENTS_TRACING_RECORD_INPUTS: {{ .Values.aiAssistant.agents.tracing.recordInputs | toString | quote }}
   N8N_AGENTS_TRACING_RECORD_OUTPUTS: {{ .Values.aiAssistant.agents.tracing.recordOutputs | toString | quote }}
+  {{- end }}
   {{- if .Values.aiAssistant.agents.sandbox }}
   {{- if .Values.aiAssistant.agents.sandbox.enabled }}
   N8N_AGENTS_AI_SANDBOX_ENABLED: {{ .Values.aiAssistant.agents.sandbox.enabled | toString | quote }}

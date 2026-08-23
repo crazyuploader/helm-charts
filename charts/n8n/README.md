@@ -4,7 +4,7 @@ Deploys [n8n](https://n8n.io) with PostgreSQL, external task runners (JavaScript
 
 | Chart version | App version |
 | ------------- | ----------- |
-| 0.1.3         | 2.32.6      |
+| 0.2.0         | 2.35.7      |
 
 ## Prerequisites
 
@@ -117,6 +117,7 @@ Add `n8n_sandbox_service_api_key` to `existingSecret`.
 
 ```yaml
 aiAssistant:
+  enabled: true
   instanceAi:
     enabledModules: "instance-ai,agents"
   agents:

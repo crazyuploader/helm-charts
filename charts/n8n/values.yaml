@@ -182,7 +182,7 @@ queue:
 # AI assistant secrets:
 # + ai_builder_anthropic_key     when aiAssistant.builder.anthropicKeyFromExistingSecret
 # + instance_ai_model_api_key    when aiAssistant.instanceAi.modelApiKeyFromExistingSecret
-# + daytona_api_key              when you enable a Daytona sandbox
+# + daytona_api_key              when aiAssistant.instanceAi.sandbox.daytonaApiKeyFromExistingSecret
 # + n8n_sandbox_service_api_key  when aiAssistant.instanceAi.sandbox.provider=n8n-sandbox
 # + instance_ai_brave_search_key when aiAssistant.instanceAi.braveSearchApiKeyFromExistingSecret
 # + instance_ai_gateway_api_key  when aiAssistant.instanceAi.gatewayApiKeyFromExistingSecret

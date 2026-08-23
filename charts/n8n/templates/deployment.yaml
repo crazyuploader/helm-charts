@@ -105,7 +105,10 @@ spec:
                   key: ai_builder_anthropic_key
             {{- else if and .Values.aiAssistant.builder.enabled .Values.aiAssistant.builder.anthropicKey }}
             - name: N8N_AI_ANTHROPIC_KEY
-              value: {{ .Values.aiAssistant.builder.anthropicKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: ai_builder_anthropic_key
             {{- end }}
             {{- end }}
             {{- if .Values.aiAssistant.instanceAi }}
@@ -117,7 +120,10 @@ spec:
                   key: instance_ai_model_api_key
             {{- else if .Values.aiAssistant.instanceAi.modelApiKey }}
             - name: N8N_INSTANCE_AI_MODEL_API_KEY
-              value: {{ .Values.aiAssistant.instanceAi.modelApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: instance_ai_model_api_key
             {{- end }}
             {{- if .Values.aiAssistant.instanceAi.sandbox }}
             {{- if or (and .Values.aiAssistant.instanceAi.sandbox.enabled (eq .Values.aiAssistant.instanceAi.sandbox.provider "daytona")) (and .Values.aiAssistant.agents .Values.aiAssistant.agents.sandbox .Values.aiAssistant.agents.sandbox.enabled) }}
@@ -129,7 +135,10 @@ spec:
                   key: daytona_api_key
             {{- else if .Values.aiAssistant.instanceAi.sandbox.daytonaApiKey }}
             - name: DAYTONA_API_KEY
-              value: {{ .Values.aiAssistant.instanceAi.sandbox.daytonaApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: daytona_api_key
             {{- end }}
             {{- end }}
             {{- if eq .Values.aiAssistant.instanceAi.sandbox.provider "n8n-sandbox" }}
@@ -141,7 +150,10 @@ spec:
                   key: n8n_sandbox_service_api_key
             {{- else if .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceApiKey }}
             - name: N8N_SANDBOX_SERVICE_API_KEY
-              value: {{ .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: n8n_sandbox_service_api_key
             {{- end }}
             {{- end }}
             {{- end }}
@@ -153,7 +165,10 @@ spec:
                   key: instance_ai_brave_search_key
             {{- else if .Values.aiAssistant.instanceAi.braveSearchApiKey }}
             - name: INSTANCE_AI_BRAVE_SEARCH_API_KEY
-              value: {{ .Values.aiAssistant.instanceAi.braveSearchApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: instance_ai_brave_search_key
             {{- end }}
             {{- if .Values.aiAssistant.instanceAi.gatewayApiKeyFromExistingSecret }}
             - name: N8N_INSTANCE_AI_GATEWAY_API_KEY
@@ -163,7 +178,10 @@ spec:
                   key: instance_ai_gateway_api_key
             {{- else if .Values.aiAssistant.instanceAi.gatewayApiKey }}
             - name: N8N_INSTANCE_AI_GATEWAY_API_KEY
-              value: {{ .Values.aiAssistant.instanceAi.gatewayApiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "n8n.fullname" . }}-ai
+                  key: instance_ai_gateway_api_key
             {{- end }}
             {{- end }}
             {{- end }}
