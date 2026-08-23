@@ -1,6 +1,9 @@
 {{- if and .Values.worker.enabled (ne .Values.config.executionsMode "queue") }}
 {{- fail "worker.enabled requires config.executionsMode=queue" }}
 {{- end }}
+{{- if and .Values.worker.enabled (not .Values.queue.redis.host) }}
+{{- fail "worker.enabled requires queue.redis.host" }}
+{{- end }}
 {{- if .Values.worker.enabled }}
 apiVersion: apps/v1
 kind: Deployment
