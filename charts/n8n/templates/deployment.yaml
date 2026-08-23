@@ -94,6 +94,79 @@ spec:
                   key: QUEUE_BULL_REDIS_PASSWORD
             {{- end }}
             {{- end }}
+            # AI Assistant secrets
+            {{- if .Values.aiAssistant }}
+            {{- if .Values.aiAssistant.builder }}
+            {{- if and .Values.aiAssistant.builder.enabled .Values.aiAssistant.builder.anthropicKeyFromExistingSecret }}
+            - name: N8N_AI_ANTHROPIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: ai_builder_anthropic_key
+            {{- else if and .Values.aiAssistant.builder.enabled .Values.aiAssistant.builder.anthropicKey }}
+            - name: N8N_AI_ANTHROPIC_KEY
+              value: {{ .Values.aiAssistant.builder.anthropicKey | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.aiAssistant.instanceAi }}
+            {{- if .Values.aiAssistant.instanceAi.modelApiKeyFromExistingSecret }}
+            - name: N8N_INSTANCE_AI_MODEL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: instance_ai_model_api_key
+            {{- else if .Values.aiAssistant.instanceAi.modelApiKey }}
+            - name: N8N_INSTANCE_AI_MODEL_API_KEY
+              value: {{ .Values.aiAssistant.instanceAi.modelApiKey | quote }}
+            {{- end }}
+            {{- if .Values.aiAssistant.instanceAi.sandbox }}
+            {{- if or (and .Values.aiAssistant.instanceAi.sandbox.enabled (eq .Values.aiAssistant.instanceAi.sandbox.provider "daytona")) (and .Values.aiAssistant.agents .Values.aiAssistant.agents.sandbox .Values.aiAssistant.agents.sandbox.enabled) }}
+            {{- if .Values.aiAssistant.instanceAi.sandbox.daytonaApiKeyFromExistingSecret }}
+            - name: DAYTONA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: daytona_api_key
+            {{- else if .Values.aiAssistant.instanceAi.sandbox.daytonaApiKey }}
+            - name: DAYTONA_API_KEY
+              value: {{ .Values.aiAssistant.instanceAi.sandbox.daytonaApiKey | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if eq .Values.aiAssistant.instanceAi.sandbox.provider "n8n-sandbox" }}
+            {{- if .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceApiKeyFromExistingSecret }}
+            - name: N8N_SANDBOX_SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: n8n_sandbox_service_api_key
+            {{- else if .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceApiKey }}
+            - name: N8N_SANDBOX_SERVICE_API_KEY
+              value: {{ .Values.aiAssistant.instanceAi.sandbox.n8nSandboxServiceApiKey | quote }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.aiAssistant.instanceAi.braveSearchApiKeyFromExistingSecret }}
+            - name: INSTANCE_AI_BRAVE_SEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: instance_ai_brave_search_key
+            {{- else if .Values.aiAssistant.instanceAi.braveSearchApiKey }}
+            - name: INSTANCE_AI_BRAVE_SEARCH_API_KEY
+              value: {{ .Values.aiAssistant.instanceAi.braveSearchApiKey | quote }}
+            {{- end }}
+            {{- if .Values.aiAssistant.instanceAi.gatewayApiKeyFromExistingSecret }}
+            - name: N8N_INSTANCE_AI_GATEWAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSecret }}
+                  key: instance_ai_gateway_api_key
+            {{- else if .Values.aiAssistant.instanceAi.gatewayApiKey }}
+            - name: N8N_INSTANCE_AI_GATEWAY_API_KEY
+              value: {{ .Values.aiAssistant.instanceAi.gatewayApiKey | quote }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

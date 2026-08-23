@@ -73,3 +73,54 @@ config:
 ```
 
 Add `smtp_password` to `existingSecret`.
+
+## AI Assistant
+
+Enable the AI Assistant with a sandbox provider (Daytona or self-hosted n8n-sandbox-service).
+
+### Daytona (managed, recommended for production)
+
+```yaml
+aiAssistant:
+  enabled: true
+  instanceAi:
+    enabledModules: "instance-ai"
+    modelApiKeyFromExistingSecret: true
+    sandbox:
+      enabled: true
+      provider: daytona
+      daytonaApiUrl: "https://app.daytona.io/api"
+      daytonaApiKeyFromExistingSecret: true
+```
+
+Add `daytona_api_key` and `instance_ai_model_api_key` to `existingSecret`.
+
+### Self-hosted n8n Sandbox Service
+
+Deploy the [n8n-sandbox-service](https://github.com/n8n-io/n8n-sandbox-service/tree/main/charts/n8n-sandbox-service) chart separately, then configure:
+
+```yaml
+aiAssistant:
+  enabled: true
+  instanceAi:
+    enabledModules: "instance-ai"
+    sandbox:
+      enabled: true
+      provider: n8n-sandbox
+      n8nSandboxServiceUrl: "http://n8n-sandbox-service-api.n8n-sandbox:8080"
+      n8nSandboxServiceApiKeyFromExistingSecret: true
+```
+
+Add `n8n_sandbox_service_api_key` to `existingSecret`.
+
+### Agents
+
+```yaml
+aiAssistant:
+  instanceAi:
+    enabledModules: "instance-ai,agents"
+  agents:
+    enabled: true
+    sandbox:
+      enabled: true
+```

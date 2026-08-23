@@ -179,6 +179,13 @@ queue:
 # + smtp_password                when config.smtp.enabled
 # + user_management_jwt_secret   when config.userManagement.jwtSecretFromExistingSecret
 # + redis_password               when queue.redis.passwordFromExistingSecret
+# AI assistant secrets:
+# + ai_builder_anthropic_key     when aiAssistant.builder.anthropicKeyFromExistingSecret
+# + instance_ai_model_api_key    when aiAssistant.instanceAi.modelApiKeyFromExistingSecret
+# + daytona_api_key              when you enable a Daytona sandbox
+# + n8n_sandbox_service_api_key  when aiAssistant.instanceAi.sandbox.provider=n8n-sandbox
+# + instance_ai_brave_search_key when aiAssistant.instanceAi.braveSearchApiKeyFromExistingSecret
+# + instance_ai_gateway_api_key  when aiAssistant.instanceAi.gatewayApiKeyFromExistingSecret
 existingSecret: ""
 
 # ── Task runner ──────────────────────────────────────────────────────────────
@@ -250,6 +257,131 @@ resources: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+# ── AI Assistant ─────────────────────────────────────────────────────────────
+
+aiAssistant:
+  # Whether AI features (AI nodes and AI assistant) are enabled globally.
+  enabled: false
+  # Maximum time in milliseconds to wait for an HTTP response from an AI service.
+  timeout: "3600000"  # 1 hour
+  # Whether workflow and node parameter values may be sent to AI providers.
+  allowSendingParameterValues: true
+
+  # AI workflow builder (Anthropic key for AI-powered workflow building)
+  builder:
+    enabled: false
+    # Set anthropicKeyFromExistingSecret: true and add ai_builder_anthropic_key
+    # to existingSecret, or set anthropicKey directly (not recommended).
+    anthropicKeyFromExistingSecret: false
+    anthropicKey: ""
+
+  # Instance AI (AI Assistant chat and agent capabilities)
+  instanceAi:
+    # AI Assistant service base URL (optional; overrides default provider endpoint).
+    assistantBaseUrl: ""
+
+    # Comma-separated list of modules to enable. Must include "instance-ai"
+    # to enable the AI Assistant. Add "agents" to enable agent features.
+    enabledModules: ""
+
+    # LLM model in provider/model format (default: anthropic/claude-opus-4-8).
+    # For a custom OpenAI-compatible endpoint, set modelUrl too.
+    model: "anthropic/claude-opus-4-8"
+    modelUrl: ""
+    # Set modelApiKeyFromExistingSecret: true and add instance_ai_model_api_key
+    # to existingSecret, or set modelApiKey directly (not recommended).
+    modelApiKeyFromExistingSecret: false
+    modelApiKey: ""
+
+    # MCP servers (comma-separated name=url pairs, e.g. "github=https://mcp.github.com/sse")
+    mcpServers: ""
+
+    # Token thresholds for Observer and Reflector
+    observerMessageTokens: 30000
+    reflectorObservationTokens: 40000
+
+    # Local gateway (filesystem, shell, browser) for all users
+    localGatewayDisabled: false
+    browserUseEnabled: true
+
+    # Sandbox for code execution (required for AI Assistant)
+    sandbox:
+      enabled: false
+      provider: daytona  # daytona | n8n-sandbox
+
+      # Configure the Daytona connection for the AI Assistant and Agents sandboxes.
+      daytonaApiUrl: ""
+      # Set daytonaApiKeyFromExistingSecret: true and add daytona_api_key
+      # to existingSecret, or set daytonaApiKey directly (not recommended).
+      daytonaApiKeyFromExistingSecret: false
+      daytonaApiKey: ""
+      image: "daytonaio/sandbox:0.5.0"
+      snapshot: ""
+      timeout: 300000  # milliseconds
+      namePrefix: ""
+      ephemeral: false
+      autoStopMinutes: 15
+      autoArchiveMinutes: 60
+      autoDeleteMinutes: 10080  # 7 days
+      daytonaTokenRefreshSkewMs: "300000"
+      builderSandboxTtlMs: "900000"
+
+      # n8n Sandbox Service configuration (used when provider: n8n-sandbox)
+      # Deploy the n8n-sandbox-service chart separately:
+      # https://github.com/n8n-io/n8n-sandbox-service/tree/main/charts/n8n-sandbox-service
+      n8nSandboxServiceUrl: ""
+      # Set n8nSandboxServiceApiKeyFromExistingSecret: true and add
+      # n8n_sandbox_service_api_key to existingSecret.
+      n8nSandboxServiceApiKeyFromExistingSecret: false
+      n8nSandboxServiceApiKey: ""
+
+    # Web search
+    braveSearchApiKeyFromExistingSecret: false
+    braveSearchApiKey: ""
+    searxngUrl: ""
+
+    # Gateway API key for filesystem access
+    gatewayApiKeyFromExistingSecret: false
+    gatewayApiKey: ""
+
+    # Output redaction settings
+    outputRedaction:
+      enabled: true
+      secrets: true
+      pii: "credit-card"
+      placeholder: "[REDACTED]"
+
+    # Thread and persistence settings
+    threadTtlDays: 30
+    pruneInterval: "3600000"  # 1 hour in ms
+    snapshotRetention: "86400000"  # 24 hours in ms
+    checkpointGcRetention: "604800000"  # 7 days in ms
+    confirmationTimeout: "86400000"  # 24 hours in ms
+
+    # Advanced / debug
+    thinkingEnabled: true
+    runDebugEnabled: false
+    durableLog: true
+    mcpConnectionsEnabled: false
+    activationCapped: false
+    activationLockMessageThreshold: 1
+
+  # Agents (requires "agents" in instanceAi.enabledModules)
+  agents:
+    enabled: false
+    modules: ""
+    checkpointTtl: 345600  # seconds
+    tracing:
+      enabled: true
+      recordInputs: true
+      recordOutputs: true
+    sandbox:
+      enabled: false
+      image: "daytonaio/sandbox:0.5.0"
+      snapshot: "daytonaio/sandbox:0.8.0"
+      timeout: 300000
+      ephemeral: false
 
 extraEnv: []
 runnerExtraEnv: []
