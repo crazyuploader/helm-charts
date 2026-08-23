@@ -13,7 +13,11 @@ spec:
     - name: healthz
       image: busybox:1.37
       command:
-        - wget
-        - "-qO-"
-        - "http://{{ include "n8n.fullname" . }}:{{ .Values.service.port }}/healthz"
+        - sh
+        - -c
+      args:
+        - |
+          until wget -qO- "http://{{ include "n8n.fullname" . }}:{{ .Values.service.port }}/healthz"; do
+            sleep 2
+          done
   restartPolicy: Never
