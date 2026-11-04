@@ -9,7 +9,7 @@ Helm charts published to an OCI registry.
 
 | Chart               | Chart version | App version | Description         |
 | ------------------- | ------------- | ----------- | ------------------- |
-| [n8n](./charts/n8n) | 0.3.46         | 2.46.4      | Workflow automation |
+| [n8n](./charts/n8n) | 0.3.47         | 2.46.5      | Workflow automation |
 
 ## Usage
 
