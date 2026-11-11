@@ -4,7 +4,7 @@ This chart deploys [n8n](https://n8n.io) with PostgreSQL, workflow workers, exte
 
 | Chart version | App version |
 | ------------- | ----------- |
-| 0.3.50         | 2.47.3      |
+| 0.3.51         | 2.47.4      |
 
 ## Prerequisites
 
